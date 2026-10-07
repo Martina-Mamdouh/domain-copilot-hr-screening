@@ -41,6 +41,8 @@ public static class DependencyInjection
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<DomainCopilot.Api.Features.Corpus.Services.IDocumentParserService, DomainCopilot.Api.Features.Corpus.Services.DocumentParserService>();
         services.AddScoped<DomainCopilot.Api.Features.Corpus.Services.IEmbeddingService, DomainCopilot.Api.Features.Corpus.Services.EmbeddingService>();
+        services.AddScoped<DomainCopilot.Api.Infrastructure.Security.IPromptInjectionGuard, DomainCopilot.Api.Infrastructure.Security.PromptInjectionGuard>();
+        services.AddScoped<DomainCopilot.Api.Features.Screening.Services.IScreeningPipelineService, DomainCopilot.Api.Features.Screening.Services.ScreeningPipelineService>();
 
         services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.GeminiLLMProvider>();
         services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.OllamaLLMProvider>();
