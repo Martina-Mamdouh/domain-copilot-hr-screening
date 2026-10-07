@@ -11,7 +11,8 @@ public enum ReviewStatus
 {
     PendingHumanApproval = 1,
     Approved = 2,
-    Overridden = 3
+    Overridden = 3,
+    Rejected = 4
 }
 
 public enum DocumentCategory

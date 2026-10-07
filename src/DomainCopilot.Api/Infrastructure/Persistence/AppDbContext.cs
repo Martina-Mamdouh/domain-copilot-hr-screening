@@ -18,7 +18,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
 
     public DbSet<DocumentChunk> DocumentChunks => Set<DocumentChunk>();
     public DbSet<CandidateEvaluation> CandidateEvaluations => Set<CandidateEvaluation>();
-    public DbSet<AuditLogEntry> AuditLogEntries => Set<AuditLogEntry>();
+    public DbSet<AuditLogEntry> AuditLogs => Set<AuditLogEntry>();
     public DbSet<AgentExecutionTrace> AgentExecutionTraces => Set<AgentExecutionTrace>();
     public DbSet<EvaluationRunMetric> EvaluationRunMetrics => Set<EvaluationRunMetric>();
 
