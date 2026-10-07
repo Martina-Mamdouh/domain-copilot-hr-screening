@@ -492,3 +492,4 @@ yarn-error.log*
 .vs/
 *.suo
 *.user
+appsettings.Development.json
