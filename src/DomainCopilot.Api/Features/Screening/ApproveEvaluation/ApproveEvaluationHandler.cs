@@ -6,7 +6,7 @@ using DomainCopilot.Api.Core.Enums;
 using DomainCopilot.Api.Infrastructure.Persistence;
 using MediatR;
 
-namespace DomainCopilot.Api.Features.Screening;
+namespace DomainCopilot.Api.Features.Screening.ApproveEvaluation;
 
 public class ApproveEvaluationHandler : IRequestHandler<ApproveEvaluationCommand, CandidateEvaluation>
 {

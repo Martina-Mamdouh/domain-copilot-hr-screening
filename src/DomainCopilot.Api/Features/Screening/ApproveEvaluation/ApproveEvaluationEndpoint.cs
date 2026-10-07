@@ -1,29 +1,17 @@
+using System;
 using DomainCopilot.Api.Common;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using System.Threading.Tasks;
 
-namespace DomainCopilot.Api.Features.Screening;
+namespace DomainCopilot.Api.Features.Screening.ApproveEvaluation;
 
-public class ScreeningEndpoint : IEndpoint
+public class ApproveEvaluationEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        // FR-3: Agentic Extractor & Evaluator
-        app.MapPost("/api/screening/evaluate", async (
-            [FromBody] EvaluateCandidateCommand command,
-            ISender sender) =>
-        {
-            var response = await sender.Send(command);
-            return Results.Ok(response);
-        })
-        .WithTags("Screening")
-        .RequireAuthorization();
-
-        // FR-4: Approval Workflow
         app.MapPost("/api/screening/approve/{evaluationId}", async (
             Guid evaluationId,
             [FromBody] ApproveEvaluationCommand command,
@@ -35,6 +23,7 @@ public class ScreeningEndpoint : IEndpoint
             var response = await sender.Send(command);
             return Results.Ok(response);
         })
+        .AddEndpointFilter<DomainCopilot.Api.Common.ValidationFilter<ApproveEvaluationCommand>>()
         .WithTags("Screening")
         .RequireAuthorization();
     }

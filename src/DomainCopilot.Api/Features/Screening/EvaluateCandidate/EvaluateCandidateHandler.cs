@@ -9,7 +9,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.SemanticKernel;
 
-namespace DomainCopilot.Api.Features.Screening;
+namespace DomainCopilot.Api.Features.Screening.EvaluateCandidate;
 
 public class EvaluateCandidateHandler : IRequestHandler<EvaluateCandidateCommand, CandidateEvaluation>
 {
