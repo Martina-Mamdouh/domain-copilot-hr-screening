@@ -58,9 +58,9 @@ public class ScreeningPipelineServiceTests
 
         // Setup Agent 1, 2, and 3
         _mockResilientLlm.SetupSequence(p => p.GenerateTextWithFallbackAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(("Skills: C#, SQL\nMeets Minimum: YES", "MockGemini")) // Agent 1
-            .ReturnsAsync(("Redacted Profile: C#, SQL", "MockGemini")) // Agent 2
-            .ReturnsAsync(("SCORE: 85\nRECOMMENDATION: SHORTLIST\nREASONING: Good match.", "MockGemini")); // Agent 3
+            .ReturnsAsync((new LLMResult("Skills: C#, SQL\nMeets Minimum: YES", 10, 15), "MockGemini")) // Agent 1
+            .ReturnsAsync((new LLMResult("Redacted Profile: C#, SQL", 20, 25), "MockGemini")) // Agent 2
+            .ReturnsAsync((new LLMResult("SCORE: 85\nRECOMMENDATION: SHORTLIST\nREASONING: Good match.", 30, 35), "MockGemini")); // Agent 3
 
         // Act
         var result = await _pipelineService.RunPipelineAsync("Clean CV", "Job Desc");
@@ -77,8 +77,13 @@ public class ScreeningPipelineServiceTests
         Assert.Contains(result.Traces, t => t.AgentName == "Agent 2 (Bias Defense & Anonymizer)");
         Assert.Contains(result.Traces, t => t.AgentName == "Agent 3 (Evaluator)");
         
-        // Assert execution durations are recorded
-        Assert.All(result.Traces, t => Assert.True(t.ExecutionDurationMs >= 0));
+        // Assert execution durations and tokens are recorded
+        Assert.All(result.Traces.Where(t => t.AgentName != "PromptInjectionGuard"), t => 
+        {
+            Assert.True(t.ExecutionDurationMs >= 0);
+            Assert.NotNull(t.PromptTokens);
+            Assert.NotNull(t.CompletionTokens);
+        });
         Assert.All(result.Traces, t => Assert.Equal("Success", t.Status));
     }
 }
