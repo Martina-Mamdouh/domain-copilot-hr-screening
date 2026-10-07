@@ -24,7 +24,7 @@ public class GeminiLLMProvider : ILLMProvider
         _model = configuration["Gemini:Model"] ?? "gemini-1.5-flash";
     }
 
-    public async Task<string> GenerateTextAsync(string systemPrompt, string userPrompt, CancellationToken cancellationToken = default)
+    public async Task<LLMResult> GenerateTextAsync(string systemPrompt, string userPrompt, CancellationToken cancellationToken = default)
     {
         var requestUrl = $"https://generativelanguage.googleapis.com/v1beta/models/{_model}:generateContent?key={_apiKey}";
         
@@ -44,7 +44,11 @@ public class GeminiLLMProvider : ILLMProvider
         var responseString = await response.Content.ReadAsStringAsync(cancellationToken);
         var jsonNode = JsonNode.Parse(responseString);
         
-        var text = jsonNode?["candidates"]?[0]?["content"]?["parts"]?[0]?["text"]?.GetValue<string>();
-        return text ?? string.Empty;
+        var text = jsonNode?["candidates"]?[0]?["content"]?["parts"]?[0]?["text"]?.GetValue<string>() ?? string.Empty;
+        
+        int? promptTokens = jsonNode?["usageMetadata"]?["promptTokenCount"]?.GetValue<int>();
+        int? completionTokens = jsonNode?["usageMetadata"]?["candidatesTokenCount"]?.GetValue<int>();
+
+        return new LLMResult(text, promptTokens, completionTokens);
     }
 }

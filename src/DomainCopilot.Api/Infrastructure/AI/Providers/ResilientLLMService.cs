@@ -20,7 +20,7 @@ public class ResilientLLMService
         _logger = logger;
     }
 
-    public virtual async Task<(string Text, string ProviderUsed)> GenerateTextWithFallbackAsync(string systemPrompt, string userPrompt, CancellationToken cancellationToken = default)
+    public virtual async Task<(LLMResult Result, string ProviderUsed)> GenerateTextWithFallbackAsync(string systemPrompt, string userPrompt, CancellationToken cancellationToken = default)
     {
         try 
         {

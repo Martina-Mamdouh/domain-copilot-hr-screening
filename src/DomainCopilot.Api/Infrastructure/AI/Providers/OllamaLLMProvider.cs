@@ -21,10 +21,10 @@ public class OllamaLLMProvider : ILLMProvider
     {
         _httpClient = httpClient;
         _baseUrl = configuration["Ollama:BaseUrl"] ?? "http://localhost:11434";
-        _modelName = configuration["Ollama:ModelName"] ?? "llama3";
+        _modelName = configuration["Ollama:ModelName"] ?? "llama3.2";
     }
 
-    public async Task<string> GenerateTextAsync(string systemPrompt, string userPrompt, CancellationToken cancellationToken = default)
+    public async Task<LLMResult> GenerateTextAsync(string systemPrompt, string userPrompt, CancellationToken cancellationToken = default)
     {
         var requestUrl = $"{_baseUrl.TrimEnd('/')}/api/generate";
         
@@ -42,7 +42,11 @@ public class OllamaLLMProvider : ILLMProvider
         var responseString = await response.Content.ReadAsStringAsync(cancellationToken);
         var jsonNode = JsonNode.Parse(responseString);
         
-        var text = jsonNode?["response"]?.GetValue<string>();
-        return text ?? string.Empty;
+        var text = jsonNode?["response"]?.GetValue<string>() ?? string.Empty;
+
+        int? promptTokens = jsonNode?["prompt_eval_count"]?.GetValue<int>();
+        int? completionTokens = jsonNode?["eval_count"]?.GetValue<int>();
+
+        return new LLMResult(text, promptTokens, completionTokens);
     }
 }

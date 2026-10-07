@@ -66,19 +66,21 @@ public class ScreeningPipelineService : IScreeningPipelineService
         var agentOneSystemPrompt = "You are Agent 1. Extract the primary skills, experience, and education from the provided CV and output a summary. Then add a new line and write 'Meets Minimum: YES' or 'Meets Minimum: NO' comparing them to the Job Description.";
         var agentOneUserPrompt = $"Job Description: {jobDescription}\n\nCandidate CV: {sanitizedCv}";
         
-        var (extractionResult, a1Provider) = await _llmService.GenerateTextWithFallbackAsync(agentOneSystemPrompt, agentOneUserPrompt, cancellationToken);
+        var llmOutputOne = await _llmService.GenerateTextWithFallbackAsync(agentOneSystemPrompt, agentOneUserPrompt, cancellationToken);
         sw.Stop();
         
-        bool meetsMinimum = extractionResult.Contains("Meets Minimum: YES", StringComparison.OrdinalIgnoreCase);
-        var agentOneResult = new AgentOneResult(extractionResult, meetsMinimum);
+        bool meetsMinimum = llmOutputOne.Result.Text.Contains("Meets Minimum: YES", StringComparison.OrdinalIgnoreCase);
+        var agentOneResult = new AgentOneResult(llmOutputOne.Result.Text, meetsMinimum);
 
         traces.Add(new AgentExecutionTrace
         {
             AgentName = "Agent 1 (Extractor)",
-            ProviderUsed = a1Provider,
+            ProviderUsed = llmOutputOne.ProviderUsed,
             InputPayload = agentOneUserPrompt,
-            OutputPayload = extractionResult,
+            OutputPayload = llmOutputOne.Result.Text,
             ExecutionDurationMs = sw.ElapsedMilliseconds,
+            PromptTokens = llmOutputOne.Result.PromptTokens,
+            CompletionTokens = llmOutputOne.Result.CompletionTokens,
             Status = "Success"
         });
 
@@ -97,20 +99,22 @@ public class ScreeningPipelineService : IScreeningPipelineService
         _logger.LogInformation("Agent 2: Bias Defense (Anonymizing extracted profile)");
         sw.Restart();
         var agentTwoSystemPrompt = "You are Agent 2 (Bias Defense). Take the candidate's extracted profile and strictly strip/redact all personal demographic identifiers including Name, Gender, Age, Nationality, and specific Addresses to ensure fairness. Replace them with [REDACTED]. Return ONLY the anonymized profile.";
-        var agentTwoUserPrompt = $"Extracted Profile:\n{extractionResult}";
+        var agentTwoUserPrompt = $"Extracted Profile:\n{llmOutputOne.Result.Text}";
         
-        var (anonymizedProfile, a2Provider) = await _llmService.GenerateTextWithFallbackAsync(agentTwoSystemPrompt, agentTwoUserPrompt, cancellationToken);
+        var llmOutputTwo = await _llmService.GenerateTextWithFallbackAsync(agentTwoSystemPrompt, agentTwoUserPrompt, cancellationToken);
         sw.Stop();
 
-        var agentTwoResult = new AgentTwoResult(anonymizedProfile, false);
+        var agentTwoResult = new AgentTwoResult(llmOutputTwo.Result.Text, false);
 
         traces.Add(new AgentExecutionTrace
         {
             AgentName = "Agent 2 (Bias Defense & Anonymizer)",
-            ProviderUsed = a2Provider,
+            ProviderUsed = llmOutputTwo.ProviderUsed,
             InputPayload = agentTwoUserPrompt,
-            OutputPayload = anonymizedProfile,
+            OutputPayload = llmOutputTwo.Result.Text,
             ExecutionDurationMs = sw.ElapsedMilliseconds,
+            PromptTokens = llmOutputTwo.Result.PromptTokens,
+            CompletionTokens = llmOutputTwo.Result.CompletionTokens,
             Status = "Success"
         });
 
@@ -118,25 +122,27 @@ public class ScreeningPipelineService : IScreeningPipelineService
         _logger.LogInformation("Agent 3: Final Evaluation and Scoring");
         sw.Restart();
         var agentThreeSystemPrompt = "You are Agent 3. Based on the anonymized candidate profile and the job description, provide a score from 0 to 100, a recommendation (HIRE, SHORTLIST, or REJECT), and a short 1-sentence reasoning (strengths/weaknesses). Format strictly as:\nSCORE: [number]\nRECOMMENDATION: [text]\nREASONING: [text]";
-        var agentThreeUserPrompt = $"Job Description: {jobDescription}\n\nAnonymized Profile: {anonymizedProfile}";
+        var agentThreeUserPrompt = $"Job Description: {jobDescription}\n\nAnonymized Profile: {llmOutputTwo.Result.Text}";
 
-        var (evaluationResult, a3Provider) = await _llmService.GenerateTextWithFallbackAsync(agentThreeSystemPrompt, agentThreeUserPrompt, cancellationToken);
+        var llmOutputThree = await _llmService.GenerateTextWithFallbackAsync(agentThreeSystemPrompt, agentThreeUserPrompt, cancellationToken);
         sw.Stop();
         
         // Parse Agent 3 Result
-        int score = ParseScore(evaluationResult);
-        string recommendation = ParseRecommendation(evaluationResult);
-        string reasoning = ParseReasoning(evaluationResult);
+        int score = ParseScore(llmOutputThree.Result.Text);
+        string recommendation = ParseRecommendation(llmOutputThree.Result.Text);
+        string reasoning = ParseReasoning(llmOutputThree.Result.Text);
 
         var agentThreeResult = new AgentThreeResult(score, recommendation, reasoning);
 
         traces.Add(new AgentExecutionTrace
         {
             AgentName = "Agent 3 (Evaluator)",
-            ProviderUsed = a3Provider,
+            ProviderUsed = llmOutputThree.ProviderUsed,
             InputPayload = agentThreeUserPrompt,
-            OutputPayload = evaluationResult,
+            OutputPayload = llmOutputThree.Result.Text,
             ExecutionDurationMs = sw.ElapsedMilliseconds,
+            PromptTokens = llmOutputThree.Result.PromptTokens,
+            CompletionTokens = llmOutputThree.Result.CompletionTokens,
             Status = "Success"
         });
 
@@ -152,41 +158,22 @@ public class ScreeningPipelineService : IScreeningPipelineService
 
     private int ParseScore(string text)
     {
-        var lines = text.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        foreach (var line in lines)
-        {
-            if (line.StartsWith("SCORE:", StringComparison.OrdinalIgnoreCase))
-            {
-                var numStr = line.Replace("SCORE:", "").Trim();
-                if (int.TryParse(numStr, out int val)) return val;
-            }
-        }
+        var match = System.Text.RegularExpressions.Regex.Match(text, @"SCORE:\s*(\d+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (match.Success && int.TryParse(match.Groups[1].Value, out int val)) return val;
         return 0; // Default
     }
 
     private string ParseRecommendation(string text)
     {
-        var lines = text.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        foreach (var line in lines)
-        {
-            if (line.StartsWith("RECOMMENDATION:", StringComparison.OrdinalIgnoreCase))
-            {
-                return line.Replace("RECOMMENDATION:", "").Trim();
-            }
-        }
+        var match = System.Text.RegularExpressions.Regex.Match(text, @"RECOMMENDATION:\s*([a-zA-Z]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (match.Success) return match.Groups[1].Value.Trim().ToUpper();
         return "UNKNOWN";
     }
 
     private string ParseReasoning(string text)
     {
-        var lines = text.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        foreach (var line in lines)
-        {
-            if (line.StartsWith("REASONING:", StringComparison.OrdinalIgnoreCase))
-            {
-                return line.Replace("REASONING:", "").Trim();
-            }
-        }
+        var match = System.Text.RegularExpressions.Regex.Match(text, @"REASONING:\s*(.+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
+        if (match.Success) return match.Groups[1].Value.Trim();
         return "No reasoning provided by LLM.";
     }
 }
