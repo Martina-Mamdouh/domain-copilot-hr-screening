@@ -9,4 +9,8 @@ public class DocumentChunk : BaseEntity
     public string SectionTitle { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
     public string? EmbeddingJson { get; set; }
+    
+    public int? PageNumber { get; set; }
+    public int ChunkIndex { get; set; }
+    public int WordCount { get; set; }
 }
