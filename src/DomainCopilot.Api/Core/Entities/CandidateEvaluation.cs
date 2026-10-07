@@ -18,6 +18,8 @@ public class CandidateEvaluation : BaseEntity
     public string CompetencyBreakdownJson { get; set; } = string.Empty;
     public Guid? ReviewedByUserId { get; set; }
     public ApplicationUser? ReviewedByUser { get; set; }
+    public string? ReviewedBy { get; set; }
+    public DateTime? ReviewedAt { get; set; }
     
     public ICollection<AuditLogEntry> AuditLogs { get; set; } = new List<AuditLogEntry>();
     public ICollection<AgentExecutionTrace> AgentExecutionTraces { get; set; } = new List<AgentExecutionTrace>();
