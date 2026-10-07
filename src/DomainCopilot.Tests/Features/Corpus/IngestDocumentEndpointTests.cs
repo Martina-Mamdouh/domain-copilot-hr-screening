@@ -89,7 +89,7 @@ public class IngestDocumentEndpointTests : IClassFixture<WebApplicationFactory<P
         fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/pdf");
         
         content.Add(fileContent, "file", "test.pdf");
-        content.Add(new StringContent("Resume"), "documentType");
+        content.Add(new StringContent("Resume"), "DocumentType");
         content.Add(new StringContent("ref-123"), "externalReferenceId");
 
         // Act
@@ -140,7 +140,7 @@ public class IngestDocumentEndpointTests : IClassFixture<WebApplicationFactory<P
         fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
         
         content.Add(fileContent, "file", "test.docx");
-        content.Add(new StringContent("Resume"), "documentType");
+        content.Add(new StringContent("Resume"), "DocumentType");
 
         // Act
         var response = await client.PostAsync("/api/corpus/ingest", content);

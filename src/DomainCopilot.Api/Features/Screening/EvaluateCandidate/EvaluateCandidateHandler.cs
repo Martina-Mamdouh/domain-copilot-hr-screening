@@ -61,10 +61,19 @@ public class EvaluateCandidateHandler : IRequestHandler<EvaluateCandidateCommand
             WeightedScore = pipelineResult.AgentThree.Score,
             RecommendedDecision = decision,
             Status = ReviewStatus.PendingHumanApproval,
-            CompetencyBreakdownJson = $"Skills: {pipelineResult.AgentOne.ExtractedSkills}\n\nReasoning: {pipelineResult.AgentThree.Reasoning}\n\nProvider: {pipelineResult.ProviderUsed}"
+            CompetencyBreakdownJson = $"Skills: {pipelineResult.AgentOne.ExtractedSkills}\n\nReasoning: {pipelineResult.AgentThree.Reasoning}"
         };
 
         _dbContext.CandidateEvaluations.Add(evaluation);
+        
+        // Link and save traces
+        foreach (var trace in pipelineResult.Traces)
+        {
+            trace.CandidateEvaluationId = evaluation.Id;
+            trace.Evaluation = evaluation;
+            _dbContext.AgentExecutionTraces.Add(trace);
+        }
+
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return evaluation;

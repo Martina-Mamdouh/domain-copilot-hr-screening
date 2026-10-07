@@ -11,7 +11,7 @@ public record ScreeningResult(
     AgentOneResult AgentOne, 
     AgentTwoResult AgentTwo, 
     AgentThreeResult AgentThree,
-    string ProviderUsed);
+    System.Collections.Generic.List<DomainCopilot.Api.Core.Entities.AgentExecutionTrace> Traces);
 
 public interface IScreeningPipelineService
 {
