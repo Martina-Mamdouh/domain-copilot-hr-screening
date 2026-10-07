@@ -39,6 +39,14 @@ public static class DependencyInjection
 
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<DomainCopilot.Api.Features.Corpus.Services.IDocumentParserService, DomainCopilot.Api.Features.Corpus.Services.DocumentParserService>();
+        services.AddScoped<DomainCopilot.Api.Features.Corpus.Services.IEmbeddingService, DomainCopilot.Api.Features.Corpus.Services.EmbeddingService>();
+        
+        services.AddSingleton<Microsoft.SemanticKernel.Embeddings.ITextEmbeddingGenerationService>(sp => 
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            var apiKey = config["OpenAI:ApiKey"] ?? "dummy-key";
+            return new Microsoft.SemanticKernel.Connectors.OpenAI.OpenAITextEmbeddingGenerationService("text-embedding-3-small", apiKey);
+        });
 
         var jwtKey = configuration["Jwt:Key"] ?? "default_super_secret_key_which_should_be_long_enough_1234567890";
         var jwtIssuer = configuration["Jwt:Issuer"] ?? "DomainCopilotApi";

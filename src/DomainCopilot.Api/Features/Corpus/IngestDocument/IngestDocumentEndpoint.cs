@@ -12,14 +12,11 @@ public class IngestDocumentEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/api/corpus/ingest", async (
-            [FromForm] IFormFile file,
-            [FromForm] string documentType,
-            [FromForm] string? externalReferenceId,
+            [AsParameters] IngestDocumentCommand command,
             ISender sender) =>
         {
             try
             {
-                var command = new IngestDocumentCommand(file, documentType, externalReferenceId);
                 var response = await sender.Send(command);
                 return Results.Ok(response);
             }

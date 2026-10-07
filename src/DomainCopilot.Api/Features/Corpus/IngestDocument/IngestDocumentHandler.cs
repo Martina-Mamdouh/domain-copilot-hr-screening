@@ -13,11 +13,13 @@ public class IngestDocumentHandler : IRequestHandler<IngestDocumentCommand, Inge
 {
     private readonly IDocumentParserService _parserService;
     private readonly AppDbContext _dbContext;
+    private readonly IEmbeddingService _embeddingService;
 
-    public IngestDocumentHandler(IDocumentParserService parserService, AppDbContext dbContext)
+    public IngestDocumentHandler(IDocumentParserService parserService, AppDbContext dbContext, IEmbeddingService embeddingService)
     {
         _parserService = parserService;
         _dbContext = dbContext;
+        _embeddingService = embeddingService;
     }
 
     public async Task<IngestDocumentResponse> Handle(IngestDocumentCommand request, CancellationToken cancellationToken)
@@ -35,6 +37,15 @@ public class IngestDocumentHandler : IRequestHandler<IngestDocumentCommand, Inge
         if (!chunks.Any())
         {
             throw new InvalidOperationException("No text could be extracted from the file.");
+        }
+
+        // Generate embeddings for all chunks
+        var texts = chunks.Select(c => c.TextContent).ToList();
+        var embeddings = await _embeddingService.GenerateEmbeddingsAsync(texts, cancellationToken);
+
+        for (int i = 0; i < chunks.Count; i++)
+        {
+            chunks[i].EmbeddingJson = System.Text.Json.JsonSerializer.Serialize(embeddings[i]);
         }
 
         _dbContext.DocumentChunks.AddRange(chunks);
