@@ -40,7 +40,7 @@ public class IngestDocumentHandler : IRequestHandler<IngestDocumentCommand, Inge
         }
 
         // Generate embeddings for all chunks
-        var texts = chunks.Select(c => c.TextContent).ToList();
+        var texts = chunks.Select(c => c.Content).ToList();
         var embeddings = await _embeddingService.GenerateEmbeddingsAsync(texts, cancellationToken);
 
         for (int i = 0; i < chunks.Count; i++)

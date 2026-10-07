@@ -18,12 +18,14 @@ namespace DomainCopilot.Tests.Features.Corpus;
 public class IngestDocumentHandlerTests
 {
     private readonly Mock<IDocumentParserService> _parserServiceMock;
+    private readonly Mock<IEmbeddingService> _embeddingServiceMock;
     private readonly AppDbContext _dbContext;
     private readonly IngestDocumentHandler _sut;
 
     public IngestDocumentHandlerTests()
     {
         _parserServiceMock = new Mock<IDocumentParserService>();
+        _embeddingServiceMock = new Mock<IEmbeddingService>();
         
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
@@ -31,7 +33,7 @@ public class IngestDocumentHandlerTests
             
         _dbContext = new AppDbContext(options);
         
-        _sut = new IngestDocumentHandler(_parserServiceMock.Object, _dbContext);
+        _sut = new IngestDocumentHandler(_parserServiceMock.Object, _dbContext, _embeddingServiceMock.Object);
     }
 
     [Fact]
@@ -52,6 +54,10 @@ public class IngestDocumentHandlerTests
 
         _parserServiceMock.Setup(p => p.ParseAsync(It.IsAny<Stream>(), "document.pdf", "Resume", "ext-123", It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedChunks);
+
+        var expectedEmbeddings = new List<float[]> { new float[] { 0.1f }, new float[] { 0.2f } };
+        _embeddingServiceMock.Setup(e => e.GenerateEmbeddingsAsync(It.IsAny<IList<string>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expectedEmbeddings);
 
         // Act
         var response = await _sut.Handle(command, CancellationToken.None);
