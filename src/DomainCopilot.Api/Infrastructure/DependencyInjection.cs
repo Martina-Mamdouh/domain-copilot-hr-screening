@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.SemanticKernel;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -46,6 +47,16 @@ public static class DependencyInjection
             var config = sp.GetRequiredService<IConfiguration>();
             var apiKey = config["OpenAI:ApiKey"] ?? "dummy-key";
             return new Microsoft.SemanticKernel.Connectors.OpenAI.OpenAITextEmbeddingGenerationService("text-embedding-3-small", apiKey);
+        });
+
+        services.AddSingleton<Microsoft.SemanticKernel.Kernel>(sp => 
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            var apiKey = config["OpenAI:ApiKey"] ?? "dummy-key";
+            
+            var builder = Microsoft.SemanticKernel.Kernel.CreateBuilder();
+            Microsoft.SemanticKernel.OpenAIKernelBuilderExtensions.AddOpenAIChatCompletion(builder, "gpt-4o-mini", apiKey);
+            return builder.Build();
         });
 
         var jwtKey = configuration["Jwt:Key"] ?? "default_super_secret_key_which_should_be_long_enough_1234567890";
