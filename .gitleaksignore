@@ -1,0 +1,8 @@
+title = "gitleaks ignore file"
+
+[ignore]
+commits = [
+    "cd9027467fc3ef269b168a588bc0b766337d053e",
+    "a89a5493b6fa8f0a7daef07ce40848a4cc2c4d40",
+    "a16e7376f5c8068cd92e7a91c6df2cbec2dc4550"
+]
