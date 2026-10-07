@@ -42,7 +42,6 @@ public class IngestDocumentEndpoint : IEndpoint
         })
         .WithTags("Corpus")
         .AddEndpointFilter<ValidationFilter<IngestDocumentCommand>>()
-        .Accepts<IFormFile>("multipart/form-data")
         .RequireAuthorization()
         .DisableAntiforgery();
     }
