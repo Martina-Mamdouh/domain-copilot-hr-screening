@@ -38,6 +38,7 @@ public static class DependencyInjection
         .AddDefaultTokenProviders();
 
         services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<DomainCopilot.Api.Features.Corpus.Services.IDocumentParserService, DomainCopilot.Api.Features.Corpus.Services.DocumentParserService>();
 
         var jwtKey = configuration["Jwt:Key"] ?? "default_super_secret_key_which_should_be_long_enough_1234567890";
         var jwtIssuer = configuration["Jwt:Issuer"] ?? "DomainCopilotApi";
