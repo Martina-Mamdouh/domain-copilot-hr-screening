@@ -93,7 +93,7 @@ public class IngestDocumentEndpointTests : IClassFixture<WebApplicationFactory<P
         content.Add(new StringContent("ref-123"), "externalReferenceId");
 
         // Act
-        var response = await client.PostAsync("/api/corpus/ingest", content);
+        var response = await client.PostAsync("/api/retrieval/ingest-document", content);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -143,7 +143,7 @@ public class IngestDocumentEndpointTests : IClassFixture<WebApplicationFactory<P
         content.Add(new StringContent("Resume"), "DocumentType");
 
         // Act
-        var response = await client.PostAsync("/api/corpus/ingest", content);
+        var response = await client.PostAsync("/api/retrieval/ingest-document", content);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);

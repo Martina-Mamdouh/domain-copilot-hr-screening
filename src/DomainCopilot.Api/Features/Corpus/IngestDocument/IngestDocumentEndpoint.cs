@@ -11,7 +11,7 @@ public class IngestDocumentEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/corpus/ingest", async (
+        app.MapPost("/api/retrieval/ingest-document", async (
             [AsParameters] IngestDocumentCommand command,
             ISender sender) =>
         {
