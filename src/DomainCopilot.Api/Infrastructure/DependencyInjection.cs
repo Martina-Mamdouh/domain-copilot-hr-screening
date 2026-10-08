@@ -42,6 +42,7 @@ public static class DependencyInjection
         services.AddScoped<DomainCopilot.Api.Features.Corpus.Services.IDocumentParserService, DomainCopilot.Api.Features.Corpus.Services.DocumentParserService>();
         services.AddScoped<DomainCopilot.Api.Core.Interfaces.IEmbeddingService, DomainCopilot.Api.Infrastructure.AI.Providers.ResilientEmbeddingService>();
         services.AddScoped<DomainCopilot.Api.Core.Interfaces.IHybridRetrievalService, DomainCopilot.Api.Features.Corpus.Search.HybridRetrievalService>();
+        services.AddScoped<DomainCopilot.Api.Core.Interfaces.IGroundedGenerationService, DomainCopilot.Api.Features.Corpus.Generation.GroundedGenerationService>();
         services.AddScoped<DomainCopilot.Api.Infrastructure.Security.IPromptInjectionGuard, DomainCopilot.Api.Infrastructure.Security.PromptInjectionGuard>();
         services.AddScoped<DomainCopilot.Api.Features.Screening.Services.IScreeningPipelineService, DomainCopilot.Api.Features.Screening.Services.ScreeningPipelineService>();
 
@@ -49,7 +50,7 @@ public static class DependencyInjection
         services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.OllamaLLMProvider>();
         services.AddScoped<DomainCopilot.Api.Infrastructure.AI.Providers.GeminiLLMProvider>();
         services.AddScoped<DomainCopilot.Api.Infrastructure.AI.Providers.OllamaLLMProvider>();
-        services.AddScoped<DomainCopilot.Api.Infrastructure.AI.Providers.ResilientLLMService>();
+        services.AddScoped<DomainCopilot.Api.Infrastructure.AI.Providers.IResilientLLMService, DomainCopilot.Api.Infrastructure.AI.Providers.ResilientLLMService>();
 
         services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.GeminiEmbeddingService>();
         services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.OllamaEmbeddingService>();
