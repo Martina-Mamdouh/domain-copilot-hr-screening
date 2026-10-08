@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DomainCopilot.Api.Infrastructure.AI.Providers;
 
-public class ResilientLLMService
+public class ResilientLLMService : IResilientLLMService
 {
     private readonly GeminiLLMProvider _primaryProvider;
     private readonly OllamaLLMProvider _fallbackProvider;

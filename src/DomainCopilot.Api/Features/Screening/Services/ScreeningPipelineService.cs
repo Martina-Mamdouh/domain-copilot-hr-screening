@@ -12,17 +12,20 @@ namespace DomainCopilot.Api.Features.Screening.Services;
 
 public class ScreeningPipelineService : IScreeningPipelineService
 {
-    private readonly ResilientLLMService _llmService;
+    private readonly IResilientLLMService _llmService;
     private readonly IPromptInjectionGuard _injectionGuard;
+    private readonly DomainCopilot.Api.Core.Interfaces.IGroundedGenerationService _groundedGenerationService;
     private readonly ILogger<ScreeningPipelineService> _logger;
 
     public ScreeningPipelineService(
-        ResilientLLMService llmService,
+        IResilientLLMService llmService,
         IPromptInjectionGuard injectionGuard,
+        DomainCopilot.Api.Core.Interfaces.IGroundedGenerationService groundedGenerationService,
         ILogger<ScreeningPipelineService> logger)
     {
         _llmService = llmService;
         _injectionGuard = injectionGuard;
+        _groundedGenerationService = groundedGenerationService;
         _logger = logger;
     }
 
@@ -118,11 +121,28 @@ public class ScreeningPipelineService : IScreeningPipelineService
             Status = "Success"
         });
 
+        // Agent 2.5: RAG Evidence Extraction
+        _logger.LogInformation("Agent 2.5: Extracting Evaluation Evidence from Corpus");
+        sw.Restart();
+        var evidenceQuery = $"What are the internal evaluation guidelines, required certifications, and standards for the following job description: {jobDescription}";
+        var evidence = await _groundedGenerationService.GenerateAnswerAsync(evidenceQuery, null, cancellationToken);
+        sw.Stop();
+
+        traces.Add(new AgentExecutionTrace
+        {
+            AgentName = "Agent 2.5 (RAG Evidence Extractor)",
+            ProviderUsed = "DomainCopilot.Corpus",
+            InputPayload = evidenceQuery,
+            OutputPayload = evidence.Answer,
+            ExecutionDurationMs = sw.ElapsedMilliseconds,
+            Status = evidence.IsGrounded ? "Success" : "No Evidence Found"
+        });
+
         // Agent 3: Evaluation & Scoring
         _logger.LogInformation("Agent 3: Final Evaluation and Scoring");
         sw.Restart();
-        var agentThreeSystemPrompt = "You are Agent 3. Based on the anonymized candidate profile and the job description, provide a score from 0 to 100, a recommendation (HIRE, SHORTLIST, or REJECT), and a short 1-sentence reasoning (strengths/weaknesses). Format strictly as:\nSCORE: [number]\nRECOMMENDATION: [text]\nREASONING: [text]";
-        var agentThreeUserPrompt = $"Job Description: {jobDescription}\n\nAnonymized Profile: {llmOutputTwo.Result.Text}";
+        var agentThreeSystemPrompt = "You are Agent 3. Based on the anonymized candidate profile, the job description, and the internal evaluation evidence provided, provide a score from 0 to 100, a recommendation (HIRE, SHORTLIST, or REJECT), and a short 1-sentence reasoning (strengths/weaknesses). Format strictly as:\nSCORE: [number]\nRECOMMENDATION: [text]\nREASONING: [text]";
+        var agentThreeUserPrompt = $"Job Description: {jobDescription}\n\nInternal Evaluation Evidence:\n{evidence.Answer}\n\nAnonymized Profile: {llmOutputTwo.Result.Text}";
 
         var llmOutputThree = await _llmService.GenerateTextWithFallbackAsync(agentThreeSystemPrompt, agentThreeUserPrompt, cancellationToken);
         sw.Stop();
@@ -132,7 +152,7 @@ public class ScreeningPipelineService : IScreeningPipelineService
         string recommendation = ParseRecommendation(llmOutputThree.Result.Text);
         string reasoning = ParseReasoning(llmOutputThree.Result.Text);
 
-        var agentThreeResult = new AgentThreeResult(score, recommendation, reasoning);
+        var agentThreeResult = new AgentThreeResult(score, recommendation, reasoning, evidence.Answer, evidence.Sources);
 
         traces.Add(new AgentExecutionTrace
         {
