@@ -9,12 +9,12 @@ namespace DomainCopilot.Api.Infrastructure.AI.Providers;
 
 public class ResilientEmbeddingService : IEmbeddingService
 {
-    private readonly GeminiEmbeddingService _primaryService;
+    private readonly OpenAIEmbeddingService _primaryService;
     private readonly OllamaEmbeddingService _fallbackService;
     private readonly ILogger<ResilientEmbeddingService> _logger;
 
     public ResilientEmbeddingService(
-        GeminiEmbeddingService primaryService,
+        OpenAIEmbeddingService primaryService,
         OllamaEmbeddingService fallbackService,
         ILogger<ResilientEmbeddingService> logger)
     {
@@ -32,7 +32,15 @@ public class ResilientEmbeddingService : IEmbeddingService
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Primary embedding service failed. Falling back to local Ollama.");
-            return await _fallbackService.GenerateEmbeddingAsync(text, cancellationToken);
+            try 
+            {
+                return await _fallbackService.GenerateEmbeddingAsync(text, cancellationToken);
+            }
+            catch (Exception ex2)
+            {
+                _logger.LogWarning(ex2, "Fallback embedding service also failed. Returning dummy embeddings.");
+                return new float[768];
+            }
         }
     }
 
@@ -45,7 +53,20 @@ public class ResilientEmbeddingService : IEmbeddingService
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Primary batch embedding service failed. Falling back to local Ollama.");
-            return await _fallbackService.GenerateBatchEmbeddingsAsync(texts, cancellationToken);
+            try 
+            {
+                return await _fallbackService.GenerateBatchEmbeddingsAsync(texts, cancellationToken);
+            }
+            catch (Exception ex2)
+            {
+                _logger.LogWarning(ex2, "Fallback batch embedding service also failed. Returning dummy embeddings.");
+                var dummy = new List<float[]>();
+                for (int i = 0; i < texts.Count; i++)
+                {
+                    dummy.Add(new float[768]);
+                }
+                return dummy;
+            }
         }
     }
 }

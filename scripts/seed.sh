@@ -11,19 +11,22 @@ if [ -z "$TOKEN" ]; then
 fi
 echo "Got token."
 
-for file in /corpus/CV-*.md; do
+for file in /corpus/CV-001.md /corpus/CV-002.md; do
   echo "Ingesting $file..."
   curl -X POST -s -o /dev/null -w "Status: %{http_code}\n" -H "Authorization: Bearer $TOKEN" -F "file=@$file" -F "documentType=Resume" -F "externalReferenceId=$(basename $file .md)" $API_URL/api/retrieval/ingest-document
+  sleep 5
 done
 
-for file in /corpus/JD-*.md; do
+for file in /corpus/JD-001.md /corpus/JD-002.md; do
   echo "Ingesting $file..."
   curl -X POST -s -o /dev/null -w "Status: %{http_code}\n" -H "Authorization: Bearer $TOKEN" -F "file=@$file" -F "documentType=JobDescription" -F "externalReferenceId=$(basename $file .md)" $API_URL/api/retrieval/ingest-document
+  sleep 5
 done
 
-for file in /corpus/RUB-*.md; do
+for file in /corpus/RUB-001.md /corpus/RUB-002.md; do
   echo "Ingesting $file..."
   curl -X POST -s -o /dev/null -w "Status: %{http_code}\n" -H "Authorization: Bearer $TOKEN" -F "file=@$file" -F "documentType=Rubric" -F "externalReferenceId=$(basename $file .md)" $API_URL/api/retrieval/ingest-document
+  sleep 5
 done
 
 echo "Seeding completed."

@@ -56,15 +56,15 @@ public static class DependencyInjection
         
         services.AddScoped<DomainCopilot.Api.Infrastructure.AI.Providers.IResilientLLMService, DomainCopilot.Api.Infrastructure.AI.Providers.ResilientLLMService>();
 
-        services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.GeminiEmbeddingService>();
+        services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.OpenAIEmbeddingService>();
         services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.OllamaEmbeddingService>();
 
         services.AddScoped(sp => 
         {
             var httpClientFactory = sp.GetRequiredService<System.Net.Http.IHttpClientFactory>();
-            var httpClient = httpClientFactory.CreateClient(nameof(DomainCopilot.Api.Infrastructure.AI.Providers.GeminiEmbeddingService));
+            var httpClient = httpClientFactory.CreateClient(nameof(DomainCopilot.Api.Infrastructure.AI.Providers.OpenAIEmbeddingService));
             var config = sp.GetRequiredService<IConfiguration>();
-            return new DomainCopilot.Api.Infrastructure.AI.Providers.GeminiEmbeddingService(httpClient, config["Gemini:ApiKey"] ?? "dummy-key");
+            return new DomainCopilot.Api.Infrastructure.AI.Providers.OpenAIEmbeddingService(httpClient, config["OpenAI:ApiKey"] ?? "dummy-key");
         });
 
         services.AddScoped(sp => 

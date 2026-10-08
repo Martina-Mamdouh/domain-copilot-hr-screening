@@ -10,8 +10,9 @@ public record GetEvaluationsQuery() : IRequest<List<EvaluationDto>>;
 public record EvaluationDto(
     Guid Id,
     string CandidateAlias,
-    double Score,
-    ScreeningDecision Recommendation,
+    double WeightedScore,
+    ScreeningDecision RecommendedDecision,
     ReviewStatus Status,
-    DateTime CreatedAt
+    DateTime CreatedAtUtc,
+    string CompetencyBreakdownJson
 );

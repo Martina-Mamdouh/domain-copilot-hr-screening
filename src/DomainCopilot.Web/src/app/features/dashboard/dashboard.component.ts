@@ -98,7 +98,20 @@ export class DashboardComponent implements OnInit {
     }
 
     this.isReviewing = true;
-    const finalStatus = isApproved ? 2 : 3; // 2 = Approved, 3 = Overridden
+    let finalStatus: number;
+    if (isApproved) {
+      if (this.selectedEval.recommendedDecision === 3 || this.selectedEval.recommendedDecision === 'Reject') {
+        finalStatus = 4; // Rejected
+      } else {
+        finalStatus = 2; // Approved
+      }
+    } else {
+      if (this.selectedEval.recommendedDecision === 3 || this.selectedEval.recommendedDecision === 'Reject') {
+        finalStatus = 2; // Approved
+      } else {
+        finalStatus = 4; // Rejected
+      }
+    }
 
     const payload = {
       finalStatus: finalStatus,

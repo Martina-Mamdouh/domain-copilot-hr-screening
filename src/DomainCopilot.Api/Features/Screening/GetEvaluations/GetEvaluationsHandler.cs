@@ -29,7 +29,8 @@ public class GetEvaluationsHandler : IRequestHandler<GetEvaluationsQuery, List<E
                 e.WeightedScore,
                 e.RecommendedDecision,
                 e.Status,
-                e.CreatedAtUtc
+                e.CreatedAtUtc,
+                e.CompetencyBreakdownJson
             ))
             .ToListAsync(cancellationToken);
 
