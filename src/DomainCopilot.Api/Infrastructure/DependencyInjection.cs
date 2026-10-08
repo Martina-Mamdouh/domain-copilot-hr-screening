@@ -40,7 +40,8 @@ public static class DependencyInjection
 
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<DomainCopilot.Api.Features.Corpus.Services.IDocumentParserService, DomainCopilot.Api.Features.Corpus.Services.DocumentParserService>();
-        services.AddScoped<DomainCopilot.Api.Features.Corpus.Services.IEmbeddingService, DomainCopilot.Api.Features.Corpus.Services.EmbeddingService>();
+        services.AddScoped<DomainCopilot.Api.Core.Interfaces.IEmbeddingService, DomainCopilot.Api.Infrastructure.AI.Providers.ResilientEmbeddingService>();
+        services.AddScoped<DomainCopilot.Api.Core.Interfaces.IHybridRetrievalService, DomainCopilot.Api.Features.Corpus.Search.HybridRetrievalService>();
         services.AddScoped<DomainCopilot.Api.Infrastructure.Security.IPromptInjectionGuard, DomainCopilot.Api.Infrastructure.Security.PromptInjectionGuard>();
         services.AddScoped<DomainCopilot.Api.Features.Screening.Services.IScreeningPipelineService, DomainCopilot.Api.Features.Screening.Services.ScreeningPipelineService>();
 
@@ -49,6 +50,25 @@ public static class DependencyInjection
         services.AddScoped<DomainCopilot.Api.Infrastructure.AI.Providers.GeminiLLMProvider>();
         services.AddScoped<DomainCopilot.Api.Infrastructure.AI.Providers.OllamaLLMProvider>();
         services.AddScoped<DomainCopilot.Api.Infrastructure.AI.Providers.ResilientLLMService>();
+
+        services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.GeminiEmbeddingService>();
+        services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.OllamaEmbeddingService>();
+
+        services.AddScoped(sp => 
+        {
+            var httpClientFactory = sp.GetRequiredService<System.Net.Http.IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient(nameof(DomainCopilot.Api.Infrastructure.AI.Providers.GeminiEmbeddingService));
+            var config = sp.GetRequiredService<IConfiguration>();
+            return new DomainCopilot.Api.Infrastructure.AI.Providers.GeminiEmbeddingService(httpClient, config["Gemini:ApiKey"] ?? "dummy-key");
+        });
+
+        services.AddScoped(sp => 
+        {
+            var httpClientFactory = sp.GetRequiredService<System.Net.Http.IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient(nameof(DomainCopilot.Api.Infrastructure.AI.Providers.OllamaEmbeddingService));
+            var config = sp.GetRequiredService<IConfiguration>();
+            return new DomainCopilot.Api.Infrastructure.AI.Providers.OllamaEmbeddingService(httpClient, config["Ollama:BaseUrl"] ?? "http://localhost:11434");
+        });
         
         services.AddSingleton<Microsoft.SemanticKernel.Embeddings.ITextEmbeddingGenerationService>(sp => 
         {

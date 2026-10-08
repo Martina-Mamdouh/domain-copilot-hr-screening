@@ -11,17 +11,14 @@ public class SearchEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/corpus/search", async (
-            [FromQuery] string query,
-            [FromQuery] int topK,
-            [FromQuery] float similarityThreshold,
+        app.MapPost("/api/retrieval/search", async (
+            [FromBody] SearchQuery command,
             ISender sender) =>
         {
-            var command = new SearchQuery(query, topK == 0 ? 5 : topK, similarityThreshold == 0 ? 0.7f : similarityThreshold);
             var response = await sender.Send(command);
             return Results.Ok(response);
         })
-        .WithTags("Corpus")
+        .WithTags("Retrieval")
         .RequireAuthorization();
     }
 }

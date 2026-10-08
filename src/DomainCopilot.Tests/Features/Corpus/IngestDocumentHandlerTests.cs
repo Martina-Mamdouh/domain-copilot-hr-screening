@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DomainCopilot.Api.Core.Entities;
 using DomainCopilot.Api.Features.Corpus.IngestDocument;
 using DomainCopilot.Api.Features.Corpus.Services;
+using DomainCopilot.Api.Core.Interfaces;
 using DomainCopilot.Api.Infrastructure.Persistence;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -56,7 +57,7 @@ public class IngestDocumentHandlerTests
             .ReturnsAsync(expectedChunks);
 
         var expectedEmbeddings = new List<float[]> { new float[] { 0.1f }, new float[] { 0.2f } };
-        _embeddingServiceMock.Setup(e => e.GenerateEmbeddingsAsync(It.IsAny<IList<string>>(), It.IsAny<CancellationToken>()))
+        _embeddingServiceMock.Setup(e => e.GenerateBatchEmbeddingsAsync(It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedEmbeddings);
 
         // Act

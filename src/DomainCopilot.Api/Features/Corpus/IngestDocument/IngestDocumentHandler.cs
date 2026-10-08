@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DomainCopilot.Api.Features.Corpus.Services;
+using DomainCopilot.Api.Core.Interfaces;
 using DomainCopilot.Api.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -41,7 +42,7 @@ public class IngestDocumentHandler : IRequestHandler<IngestDocumentCommand, Inge
 
         // Generate embeddings for all chunks
         var texts = chunks.Select(c => c.Content).ToList();
-        var embeddings = await _embeddingService.GenerateEmbeddingsAsync(texts, cancellationToken);
+        var embeddings = await _embeddingService.GenerateBatchEmbeddingsAsync(texts, cancellationToken);
 
         for (int i = 0; i < chunks.Count; i++)
         {
