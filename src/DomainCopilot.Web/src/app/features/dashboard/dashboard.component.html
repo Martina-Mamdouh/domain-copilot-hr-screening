@@ -9,7 +9,7 @@
   </div>
 
   <!-- Stats Grid -->
-  <div class="stats-grid" *ngIf="!isLoading">
+  <div class="stats-grid detailed-stats" *ngIf="!isLoading">
     <div class="stat-card glass-panel">
       <div class="stat-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--primary);">📝</div>
       <div class="stat-info">
@@ -19,26 +19,58 @@
     </div>
     
     <div class="stat-card glass-panel">
-      <div class="stat-icon" style="background: rgba(16, 185, 129, 0.2); color: var(--success);">✅</div>
-      <div class="stat-info">
-        <h3>Shortlisted / Hired</h3>
-        <span class="stat-value">{{stats.shortlisted}}</span>
-      </div>
-    </div>
-
-    <div class="stat-card glass-panel">
-      <div class="stat-icon" style="background: rgba(239, 68, 68, 0.2); color: var(--danger);">❌</div>
-      <div class="stat-info">
-        <h3>Rejected</h3>
-        <span class="stat-value">{{stats.rejected}}</span>
-      </div>
-    </div>
-
-    <div class="stat-card glass-panel">
       <div class="stat-icon" style="background: rgba(139, 92, 246, 0.2); color: var(--accent);">⭐</div>
       <div class="stat-info">
         <h3>Avg. AI Score</h3>
         <span class="stat-value">{{stats.avgScore}}%</span>
+      </div>
+    </div>
+
+    <div class="stat-card glass-panel">
+      <div class="stat-icon" style="background: rgba(16, 185, 129, 0.2); color: var(--success);">🤖✓</div>
+      <div class="stat-info">
+        <h3>AI Shortlisted</h3>
+        <span class="stat-value">{{stats.aiShortlisted}}</span>
+      </div>
+    </div>
+
+    <div class="stat-card glass-panel">
+      <div class="stat-icon" style="background: rgba(239, 68, 68, 0.2); color: var(--danger);">🤖✗</div>
+      <div class="stat-info">
+        <h3>AI Rejected</h3>
+        <span class="stat-value">{{stats.aiRejected}}</span>
+      </div>
+    </div>
+
+    <div class="stat-card glass-panel">
+      <div class="stat-icon" style="background: rgba(16, 185, 129, 0.2); color: var(--success);">🧑‍💼✓</div>
+      <div class="stat-info">
+        <h3>Manager Approved</h3>
+        <span class="stat-value">{{stats.managerApproved}}</span>
+      </div>
+    </div>
+
+    <div class="stat-card glass-panel">
+      <div class="stat-icon" style="background: rgba(239, 68, 68, 0.2); color: var(--danger);">🧑‍💼✗</div>
+      <div class="stat-info">
+        <h3>Manager Rejected</h3>
+        <span class="stat-value">{{stats.managerRejected}}</span>
+      </div>
+    </div>
+
+    <div class="stat-card glass-panel">
+      <div class="stat-icon" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">⚠️</div>
+      <div class="stat-info">
+        <h3>Manager Overrides</h3>
+        <span class="stat-value">{{stats.managerOverrides}}</span>
+      </div>
+    </div>
+
+    <div class="stat-card glass-panel">
+      <div class="stat-icon" style="background: rgba(107, 114, 128, 0.2); color: #6b7280;">⏳</div>
+      <div class="stat-info">
+        <h3>Pending Review</h3>
+        <span class="stat-value">{{stats.pendingReview}}</span>
       </div>
     </div>
   </div>

@@ -14,8 +14,12 @@ import { AuthService } from '../../core/services/auth.service';
 export class DashboardComponent implements OnInit {
   stats = {
     totalEvaluations: 0,
-    shortlisted: 0,
-    rejected: 0,
+    aiShortlisted: 0,
+    aiRejected: 0,
+    managerApproved: 0,
+    managerRejected: 0,
+    managerOverrides: 0,
+    pendingReview: 0,
     avgScore: 0
   };
 
@@ -54,9 +58,23 @@ export class DashboardComponent implements OnInit {
 
   calculateStats(data: any[]) {
     this.stats.totalEvaluations = data.length;
-    this.stats.shortlisted = data.filter(e => e.recommendedDecision === 1 || e.recommendedDecision === 2 || e.recommendedDecision === 'Shortlist' || e.recommendedDecision === 'Hold').length;
-    this.stats.rejected = data.filter(e => e.recommendedDecision === 3 || e.recommendedDecision === 'Reject').length; 
     
+    // AI Stats
+    this.stats.aiShortlisted = data.filter(e => e.recommendedDecision === 1 || e.recommendedDecision === 2 || e.recommendedDecision === 'Shortlist' || e.recommendedDecision === 'Hold').length;
+    this.stats.aiRejected = data.filter(e => e.recommendedDecision === 3 || e.recommendedDecision === 'Reject').length; 
+    
+    // Manager Stats
+    this.stats.managerApproved = data.filter(e => e.status === 2 || e.status === 'Approved' || (e.status === 3 && e.recommendedDecision === 3)).length; // Status 3 (legacy override of reject = approved)
+    this.stats.managerRejected = data.filter(e => e.status === 4 || e.status === 'Rejected' || (e.status === 3 && e.recommendedDecision === 1)).length; // Status 3 (legacy override of shortlist = rejected)
+    
+    this.stats.managerOverrides = data.filter(e => 
+      e.status === 3 || e.status === 'Overridden' || 
+      ((e.recommendedDecision === 1 || e.recommendedDecision === 'Shortlist') && (e.status === 4 || e.status === 'Rejected')) ||
+      ((e.recommendedDecision === 3 || e.recommendedDecision === 'Reject') && (e.status === 2 || e.status === 'Approved'))
+    ).length;
+    
+    this.stats.pendingReview = data.filter(e => e.status === 1 || e.status === 'PendingHumanApproval').length;
+
     if (data.length > 0) {
       const totalScore = data.reduce((acc, curr) => acc + (curr.weightedScore || 0), 0);
       this.stats.avgScore = Math.round(totalScore / data.length);
