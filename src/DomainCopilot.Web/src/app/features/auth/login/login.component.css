@@ -1,0 +1,80 @@
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--bg-base);
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15), transparent 50%),
+    radial-gradient(circle at 50% 100%, rgba(139, 92, 246, 0.15), transparent 50%);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000; /* Ensure it covers everything if needed, but we will use routing to show/hide app layout */
+}
+
+.login-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 3rem;
+}
+
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.logo-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  box-shadow: 0 0 20px var(--primary-glow);
+  margin-bottom: 1rem;
+}
+
+.logo-area h2 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(to right, #fff, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-area p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.mt-3 { margin-top: 1rem; }
+.mt-4 { margin-top: 1.5rem; }
+.w-100 { width: 100%; }
+
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.alert-error {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}

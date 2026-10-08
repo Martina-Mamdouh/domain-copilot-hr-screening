@@ -1,0 +1,110 @@
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header-section h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stat-card h3 {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.stat-card .value {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.value.warning { color: var(--warning); }
+.value.success { color: var(--success); }
+
+.recent-screenings {
+  flex: 1;
+}
+
+.recent-screenings h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.glass-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.glass-table th, .glass-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.glass-table th {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.glass-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.glass-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.score-badge {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge.hire {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--success);
+}
+
+.badge.shortlist {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--warning);
+}
+
+.badge.reject {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--danger);
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}

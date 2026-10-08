@@ -1,0 +1,31 @@
+<div class="ingestion-container">
+  <div class="header-section">
+    <h1>Corpus Ingestion</h1>
+    <p>Upload internal company guidelines, policies, and job standards to the Domain Copilot knowledge base.</p>
+  </div>
+
+  <div class="ingest-panel glass-panel">
+    
+    <div class="alert alert-success animate-fade-in" *ngIf="successMsg">
+      {{successMsg}}
+    </div>
+    <div class="alert alert-error animate-fade-in" *ngIf="errorMsg">
+      {{errorMsg}}
+    </div>
+
+    <div class="form-group">
+      <label>Document ID / Title</label>
+      <input type="text" class="input-glass" [(ngModel)]="documentId" placeholder="e.g., SE-Guidelines-2026">
+    </div>
+    
+    <div class="form-group mt-3">
+      <label>Document Content (Raw Text)</label>
+      <textarea class="input-glass" rows="12" [(ngModel)]="textContent" placeholder="Paste the full text of the policy or guideline here..."></textarea>
+    </div>
+
+    <button class="btn-primary mt-4 w-100" [disabled]="isLoading || !documentId || !textContent" (click)="submitIngestion()">
+      <span *ngIf="!isLoading">Ingest into Vector DB</span>
+      <span *ngIf="isLoading">Generating Embeddings...</span>
+    </button>
+  </div>
+</div>

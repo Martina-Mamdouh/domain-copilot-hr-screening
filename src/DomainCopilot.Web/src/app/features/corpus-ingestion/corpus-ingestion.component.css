@@ -1,0 +1,45 @@
+.ingestion-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.ingest-panel {
+  padding: 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.mt-3 { margin-top: 1rem; }
+.mt-4 { margin-top: 1.5rem; }
+.w-100 { width: 100%; }
+
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.alert-success {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.alert-error {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}

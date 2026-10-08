@@ -1,0 +1,38 @@
+<div class="chat-container glass-panel">
+  <div class="chat-header">
+    <div class="avatar">🤖</div>
+    <div class="header-info">
+      <h3>Domain Copilot</h3>
+      <span class="status">Online | RAG Knowledge Base</span>
+    </div>
+  </div>
+
+  <div class="chat-messages">
+    <div class="message-wrapper" *ngFor="let msg of messages" [ngClass]="{'bot': msg.isBot, 'user': !msg.isBot}">
+      <div class="message-bubble" [ngClass]="{'error': msg.isError}">
+        {{msg.text}}
+      </div>
+      
+      <div class="sources-list animate-fade-in" *ngIf="msg.sources && msg.sources.length > 0">
+        <span class="source-badge" *ngFor="let source of msg.sources" [title]="source.text">
+          📑 {{source.documentId}} | {{source.sectionTitle}} ({{(source.confidenceScore * 100).toFixed(1)}}%)
+        </span>
+      </div>
+    </div>
+    
+    <div class="message-wrapper bot animate-fade-in" *ngIf="isLoading">
+      <div class="message-bubble typing">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-input-area">
+    <input type="text" class="input-glass" [(ngModel)]="query" (keyup.enter)="ask()" placeholder="Ask about guidelines, skills, requirements..." [disabled]="isLoading">
+    <button class="btn-primary send-btn" (click)="ask()" [disabled]="isLoading || !query.trim()">
+      Send
+    </button>
+  </div>
+</div>

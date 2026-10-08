@@ -1,0 +1,101 @@
+<div class="upload-container">
+  <div class="header-section">
+    <h1>New Candidate Screening</h1>
+    <p>Run the candidate through the 3-Agent Evaluation Pipeline.</p>
+  </div>
+
+  <div class="split-layout">
+    <!-- Input Form -->
+    <div class="input-panel glass-panel">
+      <div class="form-group">
+        <label>Job Description</label>
+        <textarea class="input-glass" rows="4" [(ngModel)]="jobDescription" placeholder="Enter the job description and requirements..."></textarea>
+      </div>
+      
+      <div class="form-group mt-3">
+        <label>Candidate CV (Raw Text)</label>
+        <textarea class="input-glass" rows="8" [(ngModel)]="rawCvText" placeholder="Paste the candidate's CV text here..."></textarea>
+      </div>
+
+      <button class="btn-primary mt-4 w-100" [disabled]="isLoading || !jobDescription || !rawCvText" (click)="submitScreening()">
+        <span *ngIf="!isLoading">Run Agentic Screening</span>
+        <span *ngIf="isLoading">Running Pipeline...</span>
+      </button>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="results-panel glass-panel" *ngIf="result || isLoading || error">
+      
+      <div class="loader-container" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Agents are analyzing...</p>
+      </div>
+
+      <div class="error-msg" *ngIf="error">
+        {{error}}
+      </div>
+
+      <div class="results-content animate-fade-in" *ngIf="result">
+        
+        <!-- Agent 3 Summary (Final Result) -->
+        <div class="final-score">
+          <h2>Final Evaluation</h2>
+          <div class="score-display">
+            <div class="score-circle" [style.borderColor]="getScoreColor(result.agentThree.score)">
+              <span [style.color]="getScoreColor(result.agentThree.score)">{{result.agentThree.score}}</span>
+            </div>
+            <div class="recommendation">
+              <span class="badge" [ngClass]="result.agentThree.recommendation.toLowerCase()">
+                {{result.agentThree.recommendation}}
+              </span>
+              <p class="reasoning">{{result.agentThree.reasoning}}</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Agent 2.5 Evidence -->
+        <div class="evidence-section" *ngIf="result.agentThree.evidence">
+          <h3>Internal Policy Evidence (Agent 2.5)</h3>
+          <p class="evidence-text">"{{result.agentThree.evidence}}"</p>
+          <div class="sources-list" *ngIf="result.agentThree.sources && result.agentThree.sources.length > 0">
+            <h4>Sources:</h4>
+            <span class="source-badge" *ngFor="let source of result.agentThree.sources">
+              📄 {{source.documentId}} | {{source.sectionTitle}}
+            </span>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Pipeline Traces -->
+        <div class="traces-section">
+          <h3>Pipeline Execution Traces</h3>
+          <div class="trace-item" *ngFor="let trace of result.traces">
+            <div class="trace-header">
+              <span class="agent-name">{{trace.agentName}}</span>
+              <span class="status" [ngClass]="trace.status.toLowerCase()">{{trace.status}}</span>
+            </div>
+            <div class="trace-meta">
+              <span>Provider: {{trace.providerUsed}}</span> • 
+              <span>Duration: {{trace.executionDurationMs}}ms</span>
+            </div>
+            <div class="trace-payloads">
+              <details>
+                <summary>View Prompt & Response</summary>
+                <div class="payload-content">
+                  <strong>Input:</strong>
+                  <pre>{{trace.inputPayload}}</pre>
+                  <strong>Output:</strong>
+                  <pre>{{trace.outputPayload}}</pre>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

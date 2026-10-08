@@ -12,7 +12,7 @@ public class IngestDocumentEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/api/retrieval/ingest-document", async (
-            [AsParameters] IngestDocumentCommand command,
+            [FromForm] IngestDocumentCommand command,
             ISender sender) =>
         {
             try

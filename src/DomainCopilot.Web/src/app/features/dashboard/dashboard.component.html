@@ -1,0 +1,102 @@
+<div class="dashboard-container">
+  <div class="header-section">
+    <h1>HR Dashboard</h1>
+    <p>Overview of recent agentic screenings and system performance.</p>
+  </div>
+
+  <div class="alert alert-error" *ngIf="errorMsg">
+    {{errorMsg}}
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid" *ngIf="!isLoading">
+    <div class="stat-card glass-panel">
+      <div class="stat-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--primary);">📝</div>
+      <div class="stat-info">
+        <h3>Total Screenings</h3>
+        <span class="stat-value">{{stats.totalEvaluations}}</span>
+      </div>
+    </div>
+    
+    <div class="stat-card glass-panel">
+      <div class="stat-icon" style="background: rgba(16, 185, 129, 0.2); color: var(--success);">✅</div>
+      <div class="stat-info">
+        <h3>Shortlisted / Hired</h3>
+        <span class="stat-value">{{stats.shortlisted}}</span>
+      </div>
+    </div>
+
+    <div class="stat-card glass-panel">
+      <div class="stat-icon" style="background: rgba(239, 68, 68, 0.2); color: var(--danger);">❌</div>
+      <div class="stat-info">
+        <h3>Rejected</h3>
+        <span class="stat-value">{{stats.rejected}}</span>
+      </div>
+    </div>
+
+    <div class="stat-card glass-panel">
+      <div class="stat-icon" style="background: rgba(139, 92, 246, 0.2); color: var(--accent);">⭐</div>
+      <div class="stat-info">
+        <h3>Avg. AI Score</h3>
+        <span class="stat-value">{{stats.avgScore}}%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="loader" *ngIf="isLoading" style="text-align:center; padding: 2rem;">
+    Loading evaluations...
+  </div>
+
+  <!-- Recent Evaluations Table -->
+  <div class="table-container glass-panel" *ngIf="!isLoading">
+    <div class="table-header">
+      <h2>Recent Evaluations</h2>
+      <button class="btn-outline" (click)="loadEvaluations()">Refresh</button>
+    </div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>Date</th>
+          <th>AI Score</th>
+          <th>AI Recommendation</th>
+          <th>Manager Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="recentEvaluations.length === 0">
+          <td colspan="6" style="text-align: center; padding: 2rem;">No evaluations found.</td>
+        </tr>
+        <tr *ngFor="let eval of recentEvaluations">
+          <td>
+            <div class="candidate-info">
+              <span class="candidate-avatar">{{eval.candidateAlias.charAt(0)}}</span>
+              <span class="candidate-name">{{eval.candidateAlias}}</span>
+            </div>
+          </td>
+          <td>{{eval.createdAt | date:'shortDate'}}</td>
+          <td>
+            <span class="score-badge" [ngClass]="{'high': eval.score >= 80, 'medium': eval.score >= 60 && eval.score < 80, 'low': eval.score < 60}">
+              {{eval.score}}
+            </span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="getRecommendationLabel(eval.recommendation).toLowerCase()">
+              {{getRecommendationLabel(eval.recommendation)}}
+            </span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="getStatusLabel(eval.status).toLowerCase()">
+              {{getStatusLabel(eval.status)}}
+            </span>
+          </td>
+          <td>
+            <button class="btn-text">View</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

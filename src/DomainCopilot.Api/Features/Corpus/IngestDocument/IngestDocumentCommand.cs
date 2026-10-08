@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 public record IngestDocumentResponse(string Message, int TotalChunks);
 public record IngestDocumentCommand(
-    [FromForm] IFormFile File, 
-    [FromForm] string DocumentType, 
-    [FromForm] string? ExternalReferenceId
+    IFormFile File, 
+    string DocumentType, 
+    string? ExternalReferenceId
 ) : IRequest<IngestDocumentResponse>;
