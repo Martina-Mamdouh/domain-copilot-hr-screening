@@ -45,27 +45,27 @@ export class DashboardComponent implements OnInit {
 
   calculateStats(data: any[]) {
     this.stats.totalEvaluations = data.length;
-    this.stats.shortlisted = data.filter(e => e.recommendation === 1 || e.recommendation === 2).length; // Assuming enum values for Hire/Shortlist
-    this.stats.rejected = data.filter(e => e.recommendation === 0).length; // Reject
+    this.stats.shortlisted = data.filter(e => e.recommendedDecision === 1 || e.recommendedDecision === 2 || e.recommendedDecision === 'Shortlist' || e.recommendedDecision === 'Hold').length;
+    this.stats.rejected = data.filter(e => e.recommendedDecision === 3 || e.recommendedDecision === 'Reject').length; 
     
     if (data.length > 0) {
-      const totalScore = data.reduce((acc, curr) => acc + curr.score, 0);
+      const totalScore = data.reduce((acc, curr) => acc + (curr.weightedScore || 0), 0);
       this.stats.avgScore = Math.round(totalScore / data.length);
     }
   }
 
   getRecommendationLabel(rec: number | string): string {
-    if (rec === 0 || rec === 'Reject') return 'Reject';
     if (rec === 1 || rec === 'Shortlist') return 'Shortlist';
-    if (rec === 2 || rec === 'Hire') return 'Hire';
+    if (rec === 2 || rec === 'Hold') return 'Hold';
+    if (rec === 3 || rec === 'Reject') return 'Reject';
     return 'Unknown';
   }
 
   getStatusLabel(status: number | string): string {
-    if (status === 0 || status === 'Pending') return 'Pending';
-    if (status === 1 || status === 'Approved') return 'Approved';
-    if (status === 2 || status === 'Rejected') return 'Rejected';
+    if (status === 1 || status === 'PendingHumanApproval') return 'Pending';
+    if (status === 2 || status === 'Approved') return 'Approved';
     if (status === 3 || status === 'Overridden') return 'Overridden';
+    if (status === 4 || status === 'Rejected') return 'Rejected';
     return 'Unknown';
   }
 }

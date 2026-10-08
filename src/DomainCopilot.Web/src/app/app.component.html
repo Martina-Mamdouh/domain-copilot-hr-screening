@@ -12,7 +12,7 @@
           <span class="icon">📊</span>
           <span>Dashboard</span>
         </a>
-        <a *ngIf="authService.hasRole('Admin') || authService.hasRole('HRManager')" routerLink="/corpus" routerLinkActive="active" class="nav-item">
+        <a *ngIf="authService.hasRole('Admin')" routerLink="/corpus" routerLinkActive="active" class="nav-item">
           <span class="icon">📄</span>
           <span>Corpus Ingestion</span>
         </a>
@@ -20,16 +20,12 @@
           <span class="icon">💬</span>
           <span>Copilot Chat</span>
         </a>
-        <a href="#" class="nav-item">
-          <span class="icon">⚙️</span>
-          <span>Settings</span>
-        </a>
       </nav>
       
       <div class="user-profile">
-        <div class="avatar">{{authService.currentUser()?.fullName?.charAt(0) || 'HR'}}</div>
+        <div class="avatar">{{authService.currentUser()?.fullName?.charAt(0) || 'U'}}</div>
         <div class="user-info">
-          <span class="name">{{authService.currentUser()?.fullName || 'HR Evaluator'}}</span>
+          <span class="name">{{authService.currentUser()?.fullName || 'User'}}</span>
           <span class="role">{{authService.currentUser()?.roles?.[0] || 'Admin'}}</span>
           <a href="javascript:void(0)" (click)="logout()" style="color:var(--danger); font-size: 0.75rem; text-decoration: none; margin-top: 4px;">Logout</a>
         </div>

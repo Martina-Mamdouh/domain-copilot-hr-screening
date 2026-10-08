@@ -76,15 +76,15 @@
               <span class="candidate-name">{{eval.candidateAlias}}</span>
             </div>
           </td>
-          <td>{{eval.createdAt | date:'shortDate'}}</td>
+          <td>{{eval.createdAtUtc | date:'shortDate'}}</td>
           <td>
-            <span class="score-badge" [ngClass]="{'high': eval.score >= 80, 'medium': eval.score >= 60 && eval.score < 80, 'low': eval.score < 60}">
-              {{eval.score}}
+            <span class="score-badge" [ngClass]="{'high': eval.weightedScore >= 80, 'medium': eval.weightedScore >= 60 && eval.weightedScore < 80, 'low': eval.weightedScore < 60}">
+              {{eval.weightedScore}}
             </span>
           </td>
           <td>
-            <span class="badge" [ngClass]="getRecommendationLabel(eval.recommendation).toLowerCase()">
-              {{getRecommendationLabel(eval.recommendation)}}
+            <span class="badge" [ngClass]="getRecommendationLabel(eval.recommendedDecision).toLowerCase()">
+              {{getRecommendationLabel(eval.recommendedDecision)}}
             </span>
           </td>
           <td>
