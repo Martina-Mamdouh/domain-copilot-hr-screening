@@ -93,10 +93,70 @@
             </span>
           </td>
           <td>
-            <button class="btn-text">View</button>
+            <button class="btn-text" (click)="openReviewModal(eval)">View</button>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Review Modal Overlay -->
+  <div class="modal-overlay" *ngIf="selectedEval" (click)="closeReviewModal()">
+    <div class="modal-content glass-panel animate-fade-in" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Review Candidate: {{selectedEval.candidateAlias}}</h2>
+        <button class="btn-close" (click)="closeReviewModal()">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="eval-summary mb-3">
+          <div class="score-row">
+            <strong>AI Score:</strong> 
+            <span class="score-badge" [ngClass]="{'high': selectedEval.weightedScore >= 80, 'low': selectedEval.weightedScore < 60}">{{selectedEval.weightedScore}}</span>
+          </div>
+          <div class="rec-row mt-2">
+            <strong>Recommendation:</strong> 
+            <span class="badge" [ngClass]="getRecommendationLabel(selectedEval.recommendedDecision).toLowerCase()">{{getRecommendationLabel(selectedEval.recommendedDecision)}}</span>
+          </div>
+        </div>
+
+        <div class="eval-details mt-3 mb-3">
+          <strong>AI Reasoning & Breakdown:</strong>
+          <pre class="reasoning-text mt-2">{{selectedEval.competencyBreakdownJson || 'No details provided.'}}</pre>
+        </div>
+
+        <hr class="divider">
+
+        <ng-container *ngIf="authService.hasRole('Admin') || authService.hasRole('HiringManager')">
+          <div class="review-form mt-3" *ngIf="selectedEval.status === 1 || selectedEval.status === 'PendingHumanApproval'; else alreadyReviewed">
+            <h3>Manager Review</h3>
+            <div class="alert alert-error" *ngIf="reviewError">{{reviewError}}</div>
+            
+            <div class="form-group">
+              <label>Manager Comments (Optional)</label>
+              <textarea class="input-glass" rows="2" [(ngModel)]="reviewComments" placeholder="Enter any notes..."></textarea>
+            </div>
+
+            <div class="form-group mt-3">
+              <label>Override Reason <span style="color:var(--danger)">*</span> <small>(Required if you override AI)</small></label>
+              <textarea class="input-glass" rows="2" [(ngModel)]="overrideReason" placeholder="Why are you overriding the AI recommendation?"></textarea>
+            </div>
+
+            <div class="modal-actions mt-4">
+              <button class="btn-success" [disabled]="isReviewing" (click)="submitReview(true)">Approve AI Decision</button>
+              <button class="btn-danger" [disabled]="isReviewing" (click)="submitReview(false)">Override AI Decision</button>
+            </div>
+          </div>
+          <ng-template #alreadyReviewed>
+            <div class="already-reviewed mt-3">
+              <p><strong>Status:</strong> {{getStatusLabel(selectedEval.status)}}</p>
+              <p *ngIf="selectedEval.managerOverrideReason"><strong>Override Reason:</strong> {{selectedEval.managerOverrideReason}}</p>
+              <p *ngIf="selectedEval.managerReviewerNotes"><strong>Notes:</strong> {{selectedEval.managerReviewerNotes}}</p>
+              <p *ngIf="selectedEval.reviewedBy"><strong>Reviewed By:</strong> {{selectedEval.reviewedBy}}</p>
+            </div>
+          </ng-template>
+        </ng-container>
+      </div>
+    </div>
   </div>
 </div>

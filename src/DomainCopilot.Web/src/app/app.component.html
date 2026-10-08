@@ -39,7 +39,7 @@
           <input type="text" class="input-glass" placeholder="Search candidates...">
         </div>
         <div class="actions">
-          <a routerLink="/screening/new" class="btn-primary" style="text-decoration:none;">New Screening</a>
+          <a *ngIf="authService.hasRole('Admin') || authService.hasRole('Recruiter')" routerLink="/screening/new" class="btn-primary" style="text-decoration:none;">New Screening</a>
         </div>
       </header>
 

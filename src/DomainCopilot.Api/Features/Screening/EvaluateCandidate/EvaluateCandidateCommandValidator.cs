@@ -6,10 +6,10 @@ public class EvaluateCandidateCommandValidator : AbstractValidator<EvaluateCandi
 {
     public EvaluateCandidateCommandValidator()
     {
-        RuleFor(x => x.CandidateDocId)
-            .NotEmpty().WithMessage("Candidate Document ID is required.");
+        RuleFor(x => x).Must(x => !string.IsNullOrEmpty(x.CandidateDocId) || !string.IsNullOrEmpty(x.RawCvText))
+            .WithMessage("Either CandidateDocId or RawCvText is required.");
 
-        RuleFor(x => x.TargetJdId)
-            .NotEmpty().WithMessage("Target Job Description ID is required.");
+        RuleFor(x => x).Must(x => !string.IsNullOrEmpty(x.TargetJdId) || !string.IsNullOrEmpty(x.JobDescription))
+            .WithMessage("Either TargetJdId or JobDescription is required.");
     }
 }

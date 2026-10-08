@@ -4,4 +4,8 @@ using MediatR;
 
 namespace DomainCopilot.Api.Features.Screening.EvaluateCandidate;
 
-public record EvaluateCandidateCommand(string CandidateDocId, string TargetJdId) : IRequest<CandidateEvaluation>;
+public record EvaluateCandidateCommand(
+    string? CandidateDocId = null, 
+    string? TargetJdId = null,
+    string? RawCvText = null,
+    string? JobDescription = null) : IRequest<CandidateEvaluation>;

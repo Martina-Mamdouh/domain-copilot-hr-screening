@@ -24,24 +24,31 @@ public class EvaluateCandidateHandler : IRequestHandler<EvaluateCandidateCommand
 
     public async Task<CandidateEvaluation> Handle(EvaluateCandidateCommand request, CancellationToken cancellationToken)
     {
-        // 1. Fetch Candidate and JD content
-        var candidateChunks = await _dbContext.DocumentChunks
-            .Where(c => c.DocId == request.CandidateDocId)
-            .OrderBy(c => c.ChunkIndex)
-            .ToListAsync(cancellationToken);
+        string candidateContent = request.RawCvText ?? "";
+        string jdContent = request.JobDescription ?? "";
 
-        var jdChunks = await _dbContext.DocumentChunks
-            .Where(c => c.DocId == request.TargetJdId)
-            .OrderBy(c => c.ChunkIndex)
-            .ToListAsync(cancellationToken);
-
-        if (!candidateChunks.Any() || !jdChunks.Any())
+        if (string.IsNullOrWhiteSpace(candidateContent) && !string.IsNullOrEmpty(request.CandidateDocId))
         {
-            throw new InvalidOperationException("Candidate or JD documents not found.");
+            var candidateChunks = await _dbContext.DocumentChunks
+                .Where(c => c.DocId == request.CandidateDocId)
+                .OrderBy(c => c.ChunkIndex)
+                .ToListAsync(cancellationToken);
+            candidateContent = string.Join("\n", candidateChunks.Select(c => c.Content));
         }
 
-        var candidateContent = string.Join("\n", candidateChunks.Select(c => c.Content));
-        var jdContent = string.Join("\n", jdChunks.Select(c => c.Content));
+        if (string.IsNullOrWhiteSpace(jdContent) && !string.IsNullOrEmpty(request.TargetJdId))
+        {
+            var jdChunks = await _dbContext.DocumentChunks
+                .Where(c => c.DocId == request.TargetJdId)
+                .OrderBy(c => c.ChunkIndex)
+                .ToListAsync(cancellationToken);
+            jdContent = string.Join("\n", jdChunks.Select(c => c.Content));
+        }
+
+        if (string.IsNullOrWhiteSpace(candidateContent) || string.IsNullOrWhiteSpace(jdContent))
+        {
+            throw new InvalidOperationException("Candidate or JD content not found and raw text was not provided.");
+        }
 
         // 2. Run the 3-Agent Pipeline
         var pipelineResult = await _pipelineService.RunPipelineAsync(candidateContent, jdContent, cancellationToken);
@@ -55,8 +62,8 @@ public class EvaluateCandidateHandler : IRequestHandler<EvaluateCandidateCommand
 
         var evaluation = new CandidateEvaluation
         {
-            CandidateDocId = request.CandidateDocId,
-            TargetJdId = request.TargetJdId,
+            CandidateDocId = request.CandidateDocId ?? "RawCv-1",
+            TargetJdId = request.TargetJdId ?? "RawJd-1",
             CandidateAlias = "Candidate-" + Guid.NewGuid().ToString().Substring(0, 4),
             WeightedScore = pipelineResult.AgentThree.Score,
             RecommendedDecision = decision,

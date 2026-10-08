@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ScreeningService } from '../../core/services/screening.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -21,7 +23,14 @@ export class DashboardComponent implements OnInit {
   isLoading = true;
   errorMsg: string | null = null;
 
-  constructor(private screeningService: ScreeningService) {}
+  // Review Modal State
+  selectedEval: any = null;
+  overrideReason: string = '';
+  reviewComments: string = '';
+  isReviewing = false;
+  reviewError: string | null = null;
+
+  constructor(private screeningService: ScreeningService, public authService: AuthService) {}
 
   ngOnInit() {
     this.loadEvaluations();
@@ -67,5 +76,46 @@ export class DashboardComponent implements OnInit {
     if (status === 3 || status === 'Overridden') return 'Overridden';
     if (status === 4 || status === 'Rejected') return 'Rejected';
     return 'Unknown';
+  }
+
+  openReviewModal(evaluation: any) {
+    this.selectedEval = evaluation;
+    this.overrideReason = '';
+    this.reviewComments = '';
+    this.reviewError = null;
+  }
+
+  closeReviewModal() {
+    this.selectedEval = null;
+  }
+
+  submitReview(isApproved: boolean) {
+    if (!this.selectedEval) return;
+    
+    if (!isApproved && !this.overrideReason.trim()) {
+      this.reviewError = 'An override reason is mandatory when rejecting/overriding.';
+      return;
+    }
+
+    this.isReviewing = true;
+    const finalStatus = isApproved ? 2 : 3; // 2 = Approved, 3 = Overridden
+
+    const payload = {
+      finalStatus: finalStatus,
+      comments: this.reviewComments,
+      overrideReason: this.overrideReason
+    };
+
+    this.screeningService.reviewEvaluation(this.selectedEval.id, payload).subscribe({
+      next: () => {
+        this.isReviewing = false;
+        this.closeReviewModal();
+        this.loadEvaluations(); // reload table
+      },
+      error: (err) => {
+        this.isReviewing = false;
+        this.reviewError = err.error || 'Failed to submit review.';
+      }
+    });
   }
 }

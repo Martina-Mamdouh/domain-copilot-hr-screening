@@ -34,6 +34,21 @@
 .mt-4 { margin-top: 1.5rem; }
 .w-100 { width: 100%; }
 
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.file-input {
+  padding: 0.75rem;
+}
+
 /* Loader */
 .loader-container {
   display: flex;
