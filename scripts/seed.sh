@@ -2,19 +2,28 @@
 echo "Waiting for API to be ready..."
 sleep 5
 
+echo "Logging in as admin to get token..."
+TOKEN=$(curl -s -X POST -H "Content-Type: application/json" -d '{"email":"admin@copilot.local","password":"Admin@123456"}' $API_URL/api/auth/login | grep -o '"token":"[^"]*' | grep -o '[^"]*$')
+
+if [ -z "$TOKEN" ]; then
+  echo "Failed to get token! Please ensure the API is running and seeded."
+  exit 1
+fi
+echo "Got token."
+
 for file in /corpus/CV-*.md; do
   echo "Ingesting $file..."
-  curl -X POST -s -o /dev/null -w "Status: %{http_code}\n" -F "file=@$file" -F "documentType=Resume" -F "externalReferenceId=$(basename $file .md)" $API_URL/api/corpus/ingest
+  curl -X POST -s -o /dev/null -w "Status: %{http_code}\n" -H "Authorization: Bearer $TOKEN" -F "file=@$file" -F "documentType=Resume" -F "externalReferenceId=$(basename $file .md)" $API_URL/api/retrieval/ingest-document
 done
 
 for file in /corpus/JD-*.md; do
   echo "Ingesting $file..."
-  curl -X POST -s -o /dev/null -w "Status: %{http_code}\n" -F "file=@$file" -F "documentType=JobDescription" -F "externalReferenceId=$(basename $file .md)" $API_URL/api/corpus/ingest
+  curl -X POST -s -o /dev/null -w "Status: %{http_code}\n" -H "Authorization: Bearer $TOKEN" -F "file=@$file" -F "documentType=JobDescription" -F "externalReferenceId=$(basename $file .md)" $API_URL/api/retrieval/ingest-document
 done
 
 for file in /corpus/RUB-*.md; do
   echo "Ingesting $file..."
-  curl -X POST -s -o /dev/null -w "Status: %{http_code}\n" -F "file=@$file" -F "documentType=Rubric" -F "externalReferenceId=$(basename $file .md)" $API_URL/api/corpus/ingest
+  curl -X POST -s -o /dev/null -w "Status: %{http_code}\n" -H "Authorization: Bearer $TOKEN" -F "file=@$file" -F "documentType=Rubric" -F "externalReferenceId=$(basename $file .md)" $API_URL/api/retrieval/ingest-document
 done
 
 echo "Seeding completed."

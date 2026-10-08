@@ -1,0 +1,1 @@
+{ "requests": [{ "model": "models/gemini-embedding-2", "content": { "parts": [{ "text": "Hello World" }] } }] }

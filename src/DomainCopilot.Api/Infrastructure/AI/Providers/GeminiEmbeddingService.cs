@@ -14,7 +14,7 @@ public class GeminiEmbeddingService : IEmbeddingService
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
-    private readonly string _model = "text-embedding-004";
+    private readonly string _model = "gemini-embedding-2";
 
     public GeminiEmbeddingService(HttpClient httpClient, string apiKey)
     {
