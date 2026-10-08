@@ -7,11 +7,11 @@ namespace DomainCopilot.Api.Infrastructure.AI.Providers;
 
 public class ResilientLLMService : IResilientLLMService
 {
-    private readonly GeminiLLMProvider _primaryProvider;
+    private readonly OpenAILLMProvider _primaryProvider;
     private readonly OllamaLLMProvider _fallbackProvider;
     private readonly ILogger<ResilientLLMService> _logger;
     public ResilientLLMService(
-        GeminiLLMProvider primaryProvider,
+        OpenAILLMProvider primaryProvider,
         OllamaLLMProvider fallbackProvider,
         ILogger<ResilientLLMService> logger)
     {

@@ -46,10 +46,14 @@ public static class DependencyInjection
         services.AddScoped<DomainCopilot.Api.Infrastructure.Security.IPromptInjectionGuard, DomainCopilot.Api.Infrastructure.Security.PromptInjectionGuard>();
         services.AddScoped<DomainCopilot.Api.Features.Screening.Services.IScreeningPipelineService, DomainCopilot.Api.Features.Screening.Services.ScreeningPipelineService>();
 
+        services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.OpenAILLMProvider>();
         services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.GeminiLLMProvider>();
         services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.OllamaLLMProvider>();
+        
+        services.AddScoped<DomainCopilot.Api.Infrastructure.AI.Providers.OpenAILLMProvider>();
         services.AddScoped<DomainCopilot.Api.Infrastructure.AI.Providers.GeminiLLMProvider>();
         services.AddScoped<DomainCopilot.Api.Infrastructure.AI.Providers.OllamaLLMProvider>();
+        
         services.AddScoped<DomainCopilot.Api.Infrastructure.AI.Providers.IResilientLLMService, DomainCopilot.Api.Infrastructure.AI.Providers.ResilientLLMService>();
 
         services.AddHttpClient<DomainCopilot.Api.Infrastructure.AI.Providers.GeminiEmbeddingService>();
