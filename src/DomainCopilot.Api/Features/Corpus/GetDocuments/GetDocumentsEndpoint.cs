@@ -32,7 +32,7 @@ public class GetDocumentsEndpoint : IEndpoint
                                  .Select(g => new { 
                                      DocId = g.Key, 
                                      Category = g.First().Category,
-                                     Title = string.Join(" | ", g.Select(x => x.SectionTitle).Distinct().Take(2))
+                                     Title = $"Document: {g.Key}"
                                  }).ToList();
 
             return Results.Ok(uniqueDocs);

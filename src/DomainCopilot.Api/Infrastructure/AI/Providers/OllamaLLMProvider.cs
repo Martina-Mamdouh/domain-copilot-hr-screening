@@ -20,7 +20,7 @@ public class OllamaLLMProvider : ILLMProvider
     public OllamaLLMProvider(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _baseUrl = configuration["Ollama:BaseUrl"] ?? "http://localhost:11434";
+        _baseUrl = configuration["Ollama:BaseUrl"] ?? "http://host.docker.internal:11434";
         _modelName = configuration["Ollama:ModelName"] ?? "llama3.2";
     }
 
