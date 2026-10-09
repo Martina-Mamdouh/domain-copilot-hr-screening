@@ -14,5 +14,6 @@ public record EvaluationDto(
     ScreeningDecision RecommendedDecision,
     ReviewStatus Status,
     DateTime CreatedAtUtc,
-    string CompetencyBreakdownJson
+    string CompetencyBreakdownJson,
+    string? InterviewProbes
 );

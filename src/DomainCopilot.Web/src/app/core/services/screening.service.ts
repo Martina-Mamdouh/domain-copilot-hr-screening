@@ -18,6 +18,7 @@ export interface ScreeningResult {
   recommendedDecision: number;
   status: number;
   competencyBreakdownJson: string;
+  interviewProbes?: string;
   traces: any[];
 }
 

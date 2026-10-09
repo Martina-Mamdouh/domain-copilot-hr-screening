@@ -157,6 +157,11 @@
           <pre class="reasoning-text mt-2">{{selectedEval.competencyBreakdownJson || 'No details provided.'}}</pre>
         </div>
 
+        <div class="eval-details mt-3 mb-3" *ngIf="selectedEval.interviewProbes">
+          <strong style="color: var(--accent);">🎯 Suggested Interview Probes:</strong>
+          <pre class="reasoning-text mt-2" style="background: rgba(139, 92, 246, 0.05); border-left: 4px solid var(--accent);">{{selectedEval.interviewProbes}}</pre>
+        </div>
+
         <hr class="divider">
 
         <ng-container *ngIf="authService.hasRole('Admin') || authService.hasRole('HiringManager')">

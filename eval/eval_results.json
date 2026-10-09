@@ -1,0 +1,9 @@
+{
+  "totalPairs": 25,
+  "standardTotal": 20,
+  "adversarialTotal": 5,
+  "successfulCalls": 25,
+  "retrievalHitRate": "95.0",
+  "groundednessScore": "25.0",
+  "refusalCorrectness": "80.0"
+}
