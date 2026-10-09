@@ -11,4 +11,6 @@ public record SubmitReviewCommand(
     string ReviewerName, 
     Guid? ReviewerUserId,
     string? Comments, 
-    string? OverrideReason) : IRequest<CandidateEvaluation>;
+    string? OverrideReason,
+    int? EditedScore = null,
+    string? EditedProbes = null) : IRequest<CandidateEvaluation>;

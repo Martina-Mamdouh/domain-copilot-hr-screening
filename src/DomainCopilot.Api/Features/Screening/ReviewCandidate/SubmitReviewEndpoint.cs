@@ -38,7 +38,9 @@ public class SubmitReviewEndpoint : IEndpoint
                 reviewerName, 
                 reviewerUserId,
                 request.Comments, 
-                request.OverrideReason);
+                request.OverrideReason,
+                request.EditedScore,
+                request.EditedProbes);
 
             try
             {
@@ -59,5 +61,7 @@ public record SubmitReviewRequest(
     ReviewStatus FinalStatus,
     string? ReviewerName,
     string? Comments,
-    string? OverrideReason
+    string? OverrideReason,
+    int? EditedScore = null,
+    string? EditedProbes = null
 );

@@ -50,6 +50,15 @@ public class SubmitReviewHandler : IRequestHandler<SubmitReviewCommand, Candidat
             evaluation.ManagerOverrideReason = request.OverrideReason;
         }
 
+        if (request.EditedScore.HasValue)
+        {
+            evaluation.WeightedScore = request.EditedScore.Value;
+        }
+        if (request.EditedProbes != null)
+        {
+            evaluation.InterviewProbes = request.EditedProbes;
+        }
+
         var auditLog = new AuditLogEntry
         {
             CandidateEvaluationId = evaluation.Id,
