@@ -87,6 +87,39 @@ C4Component
     Rel(resilientLLM, ollamaClient, "Fallback Route")
 ```
 
+### Layer Dependency Diagram (Clean Architecture)
+Illustrates the strict inner-pointing dependencies of the backend following Clean Architecture principles.
+
+```mermaid
+flowchart TD
+    subgraph Infrastructure Layer
+        Persistence[EF Core / SQL Server]
+        External[Gemini / Ollama Providers]
+    end
+
+    subgraph Presentation Layer
+        WebAPI[Controllers / Minimal APIs]
+    end
+
+    subgraph Application Layer
+        UseCases[MediatR Handlers / DTOs]
+        Interfaces[Repository & Service Interfaces]
+    end
+
+    subgraph Core Layer
+        Entities[Domain Entities / Enums]
+    end
+
+    WebAPI -->|References| ApplicationLayer
+    Infrastructure -->|Implements| ApplicationLayer
+    ApplicationLayer -->|References| CoreLayer
+    
+    style CoreLayer fill:#4f46e5,stroke:#fff,color:#fff
+    style ApplicationLayer fill:#0ea5e9,stroke:#fff,color:#fff
+    style Infrastructure fill:#64748b,stroke:#fff,color:#fff
+    style PresentationLayer fill:#0284c7,stroke:#fff,color:#fff
+```
+
 ---
 
 ## 2. Sequence Diagram: Candidate Screening Workflow
