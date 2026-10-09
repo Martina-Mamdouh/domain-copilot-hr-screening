@@ -46,6 +46,9 @@ export class DashboardComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 5;
 
+  // Traces Toggle
+  showTraces = false;
+
   constructor(private screeningService: ScreeningService, public authService: AuthService) { }
 
   ngOnInit() {
@@ -148,10 +151,15 @@ export class DashboardComponent implements OnInit {
 
   closeReviewModal() {
     this.selectedEval = null;
+    this.showTraces = false;
   }
 
   toggleEditMode() {
     this.isEditMode = true;
+  }
+
+  toggleTraces() {
+    this.showTraces = !this.showTraces;
   }
 
   submitReview(action: 'approve' | 'reject' | 'edit') {

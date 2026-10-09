@@ -20,6 +20,7 @@ public class GetEvaluationsHandler : IRequestHandler<GetEvaluationsQuery, List<E
     public async Task<List<EvaluationDto>> Handle(GetEvaluationsQuery request, CancellationToken cancellationToken)
     {
         var evaluations = await _dbContext.CandidateEvaluations
+            .Include(e => e.AgentExecutionTraces)
             .AsNoTracking()
             .OrderByDescending(e => e.CreatedAtUtc)
             .Take(50)
@@ -31,7 +32,8 @@ public class GetEvaluationsHandler : IRequestHandler<GetEvaluationsQuery, List<E
                 e.Status,
                 e.CreatedAtUtc,
                 e.CompetencyBreakdownJson,
-                e.InterviewProbes
+                e.InterviewProbes,
+                e.AgentExecutionTraces.Select(t => new TraceDto(t.AgentName, t.ProviderUsed, t.PromptTokens, t.CompletionTokens, t.ExecutionDurationMs)).ToList()
             ))
             .ToListAsync(cancellationToken);
 

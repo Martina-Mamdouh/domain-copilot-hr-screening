@@ -15,5 +15,14 @@ public record EvaluationDto(
     ReviewStatus Status,
     DateTime CreatedAtUtc,
     string CompetencyBreakdownJson,
-    string? InterviewProbes
+    string? InterviewProbes,
+    List<TraceDto>? ExecutionTraces = null
+);
+
+public record TraceDto(
+    string AgentName, 
+    string ModelUsed, 
+    int? PromptTokens, 
+    int? CompletionTokens, 
+    long LatencyMs
 );

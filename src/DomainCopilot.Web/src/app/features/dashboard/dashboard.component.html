@@ -178,6 +178,43 @@
 
         <hr class="divider">
 
+        <!-- Admin Traces Section -->
+        <ng-container *ngIf="authService.hasRole('Admin')">
+          <div class="traces-section mt-3 mb-3">
+            <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" (click)="toggleTraces()">
+              <h4 style="margin: 0; color: #9ca3af;">🔍 Execution Traces & Diagnostics</h4>
+              <span style="color: #9ca3af;">{{showTraces ? '▼' : '▶'}}</span>
+            </div>
+            
+            <div class="traces-content mt-2" *ngIf="showTraces">
+              <table class="data-table" style="font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.1);">
+                <thead>
+                  <tr>
+                    <th style="padding: 0.5rem;">Agent</th>
+                    <th style="padding: 0.5rem;">Model</th>
+                    <th style="padding: 0.5rem;">Prompt Tok</th>
+                    <th style="padding: 0.5rem;">Comp Tok</th>
+                    <th style="padding: 0.5rem;">Latency</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="!selectedEval.executionTraces || selectedEval.executionTraces.length === 0">
+                    <td colspan="5" style="text-align: center; color: var(--text-secondary);">No traces available.</td>
+                  </tr>
+                  <tr *ngFor="let trace of selectedEval.executionTraces">
+                    <td style="padding: 0.5rem;">{{trace.agentName}}</td>
+                    <td style="padding: 0.5rem;"><span class="badge" style="background: rgba(255,255,255,0.1);">{{trace.modelUsed}}</span></td>
+                    <td style="padding: 0.5rem;">{{trace.promptTokens}}</td>
+                    <td style="padding: 0.5rem;">{{trace.completionTokens}}</td>
+                    <td style="padding: 0.5rem;">{{trace.latencyMs}}ms</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <hr class="divider">
+        </ng-container>
+
         <ng-container *ngIf="authService.hasRole('Admin') || authService.hasRole('HiringManager')">
           <div class="review-form mt-3" *ngIf="selectedEval.status === 1 || selectedEval.status === 'PendingHumanApproval'; else alreadyReviewed">
             
