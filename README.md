@@ -67,9 +67,9 @@ The system enforces Role-Based Access Control. Use the following credentials to 
 
 | Role | Email | Password | Permissions |
 |---|---|---|---|
-| **Recruiter** | `recruiter@domain.com` | `Recruiter!123` | Upload CVs, View Chat, Start Screening |
-| **Hiring Manager** | `manager@domain.com` | `Manager!123` | View candidates, Override decisions (Approval Gate) |
-| **System Admin** | `admin@domain.com` | `Admin!123` | View Observability traces, Cost metrics, and System health |
+| **Recruiter** | `recruiter@copilot.local` | `Recruiter@123456` | Upload CVs, View Chat, Start Screening |
+| **Hiring Manager** | `manager@copilot.local` | `Manager@123456` | View candidates, Override decisions (Approval Gate) |
+| **System Admin** | `admin@copilot.local` | `Admin@123456` | View Observability traces, Cost metrics, and System health |
 
 *(Note: In the current MVP local testing environment, these are mock roles simulated by the frontend Auth Service toggle for ease of demonstration without requiring complex external identity setup).*
 
@@ -77,5 +77,11 @@ The system enforces Role-Based Access Control. Use the following credentials to 
 
 ## 6. Video Submissions
 
-- **Product Demo Video (5-8 minutes):** [Insert YouTube Unlisted Link Here]
-- **Teaching Sample Video (10 minutes):** [Insert YouTube Unlisted Link Here]
+- **Product Demo Video (6 mins):**  
+  [Watch Product Demo](https://drive.google.com/file/d/1JYcvwhbmmrLf4APXj69MEV6g0f4S07kS/view?usp=sharing)  
+  *Walkthrough covering the 6-Minute Demo Path: Document Ingestion, RAG Chat with Chunk Citations, 3-Agent Screening Pipeline, Human-in-the-Loop Approval Gate, and Admin Observability Traces.*
+
+- **Teaching Sample Video (5 mins):**  
+  [Watch Teaching Sample](https://drive.google.com/file/d/1YHdgjXc2KyMH_4ucl85Nh4umnCKStWrh/view?usp=sharing)  
+  *(Face & Voice required)*  
+  *An intensive lecture slice delivering core architecture: 3-Agent Sequential Orchestration, Type-Safe DTO Boundaries, Early-Exit Economics, and OWASP LLM06 Bias Sanitization.*
