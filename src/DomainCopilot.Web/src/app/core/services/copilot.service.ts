@@ -9,11 +9,11 @@ export interface AskQuery {
 }
 
 export interface RetrievedChunkDto {
-  documentId: string;
+  docId: string;
   chunkId: string;
   sectionTitle: string;
   text: string;
-  confidenceScore: number;
+  relevanceScore: number;
 }
 
 export interface GroundedAnswerDto {

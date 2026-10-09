@@ -40,7 +40,15 @@ public class HybridRetrievalService : IHybridRetrievalService
         var queryable = _dbContext.DocumentChunks.AsNoTracking();
         if (!string.IsNullOrWhiteSpace(categoryFilter))
         {
-            queryable = queryable.Where(c => c.Category == categoryFilter);
+            if (categoryFilter.StartsWith("!")) 
+            {
+                var exclude = categoryFilter.Substring(1);
+                queryable = queryable.Where(c => c.Category != exclude);
+            } 
+            else 
+            {
+                queryable = queryable.Where(c => c.Category == categoryFilter);
+            }
         }
         
         var allChunks = await queryable.ToListAsync(cancellationToken);
@@ -66,8 +74,11 @@ public class HybridRetrievalService : IHybridRetrievalService
             .ToList();
 
         // 2. Lexical Search (Keyword matching)
+        var stopWords = new HashSet<string> { "a", "an", "the", "and", "or", "but", "is", "are", "was", "were", "to", "in", "for", "of", "with", "on", "at", "by", "what", "how", "why", "when", "where", "it", "this", "that", "?" };
+        
         var keywordKeywords = query.Split(new[] { ' ', '\t', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                                    .Select(k => k.ToLowerInvariant())
+                                   .Where(k => !stopWords.Contains(k))
                                    .ToList();
 
         var lexicalResults = new List<(Guid ChunkId, float Score)>();

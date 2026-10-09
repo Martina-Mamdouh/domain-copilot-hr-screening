@@ -29,7 +29,10 @@ public class GroundedGenerationService : IGroundedGenerationService
     {
         _logger.LogInformation("Retrieving relevant chunks for query: {Query}", query);
         
-        var chunks = await _retrievalService.RetrieveRelevantChunksAsync(query, categoryFilter, topK: 5, cancellationToken);
+        // Exclude Resumes by default to prevent leaking PII and Candidate Data into general Chat/RAG!
+        var filter = string.IsNullOrWhiteSpace(categoryFilter) ? "!Resume" : categoryFilter;
+
+        var chunks = await _retrievalService.RetrieveRelevantChunksAsync(query, filter, topK: 5, cancellationToken);
 
         if (chunks == null || !chunks.Any())
         {

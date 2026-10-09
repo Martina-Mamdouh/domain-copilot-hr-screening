@@ -8,14 +8,25 @@
       </div>
       
       <nav class="nav-menu">
+        <!-- Dashboard: All Roles -->
         <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
           <span class="icon">📊</span>
           <span>Dashboard</span>
         </a>
+
+        <!-- New Screening: Admin, Recruiter -->
+        <a *ngIf="authService.hasRole('Admin') || authService.hasRole('Recruiter')" routerLink="/screening/new" routerLinkActive="active" class="nav-item">
+          <span class="icon">🔍</span>
+          <span>New Screening</span>
+        </a>
+
+        <!-- Corpus Ingestion: Admin Only -->
         <a *ngIf="authService.hasRole('Admin')" routerLink="/corpus" routerLinkActive="active" class="nav-item">
           <span class="icon">📄</span>
           <span>Corpus Ingestion</span>
         </a>
+
+        <!-- Copilot Chat: All Roles -->
         <a routerLink="/copilot" routerLinkActive="active" class="nav-item">
           <span class="icon">💬</span>
           <span>Copilot Chat</span>
@@ -39,7 +50,7 @@
           <input type="text" class="input-glass" placeholder="Search candidates...">
         </div>
         <div class="actions">
-          <a *ngIf="authService.hasRole('Admin') || authService.hasRole('Recruiter')" routerLink="/screening/new" class="btn-primary" style="text-decoration:none;">New Screening</a>
+          <!-- Topbar actions can go here (e.g. notifications) -->
         </div>
       </header>
 
