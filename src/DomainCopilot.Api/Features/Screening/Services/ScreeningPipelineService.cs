@@ -58,7 +58,7 @@ public class ScreeningPipelineService : IScreeningPipelineService
             return new ScreeningResult(
                 new AgentOneResult("N/A", false),
                 new AgentTwoResult(sanitizedCv, true),
-                new AgentThreeResult(0, "REJECTED_SECURITY_RISK", "Malicious prompt injection detected in the CV."),
+                new AgentThreeResult(0, "REJECTED_SECURITY_RISK", "Malicious prompt injection detected in the CV.", "N/A"),
                 traces
             );
         }
@@ -72,7 +72,13 @@ public class ScreeningPipelineService : IScreeningPipelineService
         var llmOutputOne = await _llmService.GenerateTextWithFallbackAsync(agentOneSystemPrompt, agentOneUserPrompt, cancellationToken);
         sw.Stop();
         
-        bool meetsMinimum = llmOutputOne.Result.Text.Contains("Meets Minimum: YES", StringComparison.OrdinalIgnoreCase);
+        // If the LLM didn't explicitly say "Meets Minimum: NO", we assume it passes to allow the pipeline to continue.
+        // Small local models (like llama3.2) often forget to include the exact string.
+        bool explicitlyRejected = llmOutputOne.Result.Text.Contains("Meets Minimum: NO", StringComparison.OrdinalIgnoreCase) || 
+                                  llmOutputOne.Result.Text.Contains("does not meet", StringComparison.OrdinalIgnoreCase);
+        
+        bool meetsMinimum = !explicitlyRejected;
+        
         var agentOneResult = new AgentOneResult(llmOutputOne.Result.Text, meetsMinimum);
 
         traces.Add(new AgentExecutionTrace
@@ -93,7 +99,7 @@ public class ScreeningPipelineService : IScreeningPipelineService
             return new ScreeningResult(
                 agentOneResult,
                 new AgentTwoResult(sanitizedCv, false),
-                new AgentThreeResult(0, "REJECTED_UNQUALIFIED", "Candidate lacks minimum required skills."),
+                new AgentThreeResult(0, "REJECTED_UNQUALIFIED", "Candidate lacks minimum required skills.", "N/A"),
                 traces
             );
         }
@@ -141,7 +147,7 @@ public class ScreeningPipelineService : IScreeningPipelineService
         // Agent 3: Evaluation & Scoring
         _logger.LogInformation("Agent 3: Final Evaluation and Scoring");
         sw.Restart();
-        var agentThreeSystemPrompt = "You are Agent 3. Based on the anonymized candidate profile, the job description, and the internal evaluation evidence provided, provide a score from 0 to 100, a recommendation (HIRE, SHORTLIST, or REJECT), and a short 1-sentence reasoning (strengths/weaknesses). Format strictly as:\nSCORE: [number]\nRECOMMENDATION: [text]\nREASONING: [text]";
+        var agentThreeSystemPrompt = "You are Agent 3. Based on the anonymized candidate profile, the job description, and the internal evaluation evidence provided, provide a score from 0 to 100, a recommendation (HIRE, SHORTLIST, or REJECT), a short 1-sentence reasoning (strengths/weaknesses), and 3 Interview Probes (questions to ask the candidate to test their gaps). Format strictly as:\nSCORE: [number]\nRECOMMENDATION: [text]\nREASONING: [text]\nPROBES: [text]";
         var agentThreeUserPrompt = $"Job Description: {jobDescription}\n\nInternal Evaluation Evidence:\n{evidence.Answer}\n\nAnonymized Profile: {llmOutputTwo.Result.Text}";
 
         var llmOutputThree = await _llmService.GenerateTextWithFallbackAsync(agentThreeSystemPrompt, agentThreeUserPrompt, cancellationToken);
@@ -151,8 +157,9 @@ public class ScreeningPipelineService : IScreeningPipelineService
         int score = ParseScore(llmOutputThree.Result.Text);
         string recommendation = ParseRecommendation(llmOutputThree.Result.Text);
         string reasoning = ParseReasoning(llmOutputThree.Result.Text);
+        string probes = ParseProbes(llmOutputThree.Result.Text);
 
-        var agentThreeResult = new AgentThreeResult(score, recommendation, reasoning, evidence.Answer, evidence.Sources);
+        var agentThreeResult = new AgentThreeResult(score, recommendation, reasoning, probes, evidence.Answer, evidence.Sources);
 
         traces.Add(new AgentExecutionTrace
         {
@@ -192,8 +199,15 @@ public class ScreeningPipelineService : IScreeningPipelineService
 
     private string ParseReasoning(string text)
     {
-        var match = System.Text.RegularExpressions.Regex.Match(text, @"REASONING:\s*(.+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
+        var match = System.Text.RegularExpressions.Regex.Match(text, @"REASONING:\s*(.+?)(?=\nPROBES:|$)", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
         if (match.Success) return match.Groups[1].Value.Trim();
         return "No reasoning provided by LLM.";
+    }
+
+    private string ParseProbes(string text)
+    {
+        var match = System.Text.RegularExpressions.Regex.Match(text, @"PROBES:\s*(.+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
+        if (match.Success) return match.Groups[1].Value.Trim();
+        return "No interview probes provided.";
     }
 }

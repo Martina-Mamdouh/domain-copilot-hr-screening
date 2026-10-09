@@ -20,8 +20,8 @@ public class GeminiLLMProvider : ILLMProvider
     public GeminiLLMProvider(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _apiKey = configuration["Gemini:ApiKey"] ?? throw new ArgumentNullException("Gemini:ApiKey missing");
-        _model = configuration["Gemini:Model"] ?? "gemini-1.5-flash";
+        _apiKey = (configuration["Gemini:ApiKey"] ?? throw new ArgumentNullException("Gemini:ApiKey missing")).Trim();
+        _model = (configuration["Gemini:Model"] ?? "gemini-1.5-flash").Trim();
     }
 
     public async Task<LLMResult> GenerateTextAsync(string systemPrompt, string userPrompt, CancellationToken cancellationToken = default)
@@ -30,7 +30,7 @@ public class GeminiLLMProvider : ILLMProvider
         
         var requestBody = new
         {
-            system_instruction = new { parts = new[] { new { text = systemPrompt } } },
+            systemInstruction = new { parts = new[] { new { text = systemPrompt } } },
             contents = new[]
             {
                 new { role = "user", parts = new[] { new { text = userPrompt } } }

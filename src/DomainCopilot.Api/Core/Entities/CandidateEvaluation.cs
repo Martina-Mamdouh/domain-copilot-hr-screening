@@ -16,6 +16,7 @@ public class CandidateEvaluation : BaseEntity
     public string? ManagerOverrideReason { get; set; }
     public string? ManagerReviewerNotes { get; set; }
     public string CompetencyBreakdownJson { get; set; } = string.Empty;
+    public string? InterviewProbes { get; set; }
     public Guid? ReviewedByUserId { get; set; }
     public ApplicationUser? ReviewedByUser { get; set; }
     public string? ReviewedBy { get; set; }

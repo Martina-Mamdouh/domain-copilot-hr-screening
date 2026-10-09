@@ -68,7 +68,8 @@ public class EvaluateCandidateHandler : IRequestHandler<EvaluateCandidateCommand
             WeightedScore = pipelineResult.AgentThree.Score,
             RecommendedDecision = decision,
             Status = ReviewStatus.PendingHumanApproval,
-            CompetencyBreakdownJson = $"Skills: {pipelineResult.AgentOne.ExtractedSkills}\n\nReasoning: {pipelineResult.AgentThree.Reasoning}"
+            CompetencyBreakdownJson = $"Skills: {pipelineResult.AgentOne.ExtractedSkills}\n\nReasoning: {pipelineResult.AgentThree.Reasoning}",
+            InterviewProbes = pipelineResult.AgentThree.InterviewProbes
         };
 
         _dbContext.CandidateEvaluations.Add(evaluation);

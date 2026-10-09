@@ -5,7 +5,7 @@ namespace DomainCopilot.Api.Features.Screening.Services;
 
 public record AgentOneResult(string ExtractedSkills, bool MeetsMinimumRequirements);
 public record AgentTwoResult(string SanitizedCv, bool InjectionDetected);
-public record AgentThreeResult(int Score, string Recommendation, string Reasoning, string Evidence = "", System.Collections.Generic.IReadOnlyList<DomainCopilot.Api.Core.Interfaces.RetrievedChunkDto>? Sources = null);
+public record AgentThreeResult(int Score, string Recommendation, string Reasoning, string InterviewProbes = "", string Evidence = "", System.Collections.Generic.IReadOnlyList<DomainCopilot.Api.Core.Interfaces.RetrievedChunkDto>? Sources = null);
 
 public record ScreeningResult(
     AgentOneResult AgentOne, 
