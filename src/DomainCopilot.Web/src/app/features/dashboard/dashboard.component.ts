@@ -35,6 +35,12 @@ export class DashboardComponent implements OnInit {
   reviewComments: string = '';
   isReviewing = false;
   reviewError: string | null = null;
+  
+  // Edit State
+  isEditMode = false;
+  editedDecision: string = 'Approve'; // Approve, Hire, Shortlist, Reject
+  editedScore: number | null = null;
+  editedProbes: string = '';
 
   // Pagination State
   currentPage = 1;
@@ -134,41 +140,63 @@ export class DashboardComponent implements OnInit {
     this.overrideReason = '';
     this.reviewComments = '';
     this.reviewError = null;
+    this.isEditMode = false;
+    this.editedDecision = 'Change Decision To...';
+    this.editedScore = evaluation.weightedScore;
+    this.editedProbes = evaluation.interviewProbes || '';
   }
 
   closeReviewModal() {
     this.selectedEval = null;
   }
 
-  submitReview(isApproved: boolean) {
+  toggleEditMode() {
+    this.isEditMode = true;
+  }
+
+  submitReview(action: 'approve' | 'reject' | 'edit') {
     if (!this.selectedEval) return;
 
-    if (!isApproved && !this.overrideReason.trim()) {
-      this.reviewError = 'An override reason is mandatory when rejecting/overriding.';
+    this.reviewError = null;
+
+    if (action === 'reject' && !this.overrideReason.trim()) {
+      this.reviewError = 'An override reason is mandatory when rejecting.';
+      return;
+    }
+    
+    if (action === 'edit' && this.editedDecision === 'Change Decision To...') {
+      this.reviewError = 'Please select a valid decision from the dropdown.';
+      return;
+    }
+
+    if (action === 'edit' && !this.overrideReason.trim()) {
+      this.reviewError = 'An override reason is mandatory when changing the decision or details.';
       return;
     }
 
     this.isReviewing = true;
     let finalStatus: number;
-    if (isApproved) {
-      if (this.selectedEval.recommendedDecision === 3 || this.selectedEval.recommendedDecision === 'Reject') {
-        finalStatus = 4; // Rejected
-      } else {
-        finalStatus = 2; // Approved
-      }
-    } else {
-      if (this.selectedEval.recommendedDecision === 3 || this.selectedEval.recommendedDecision === 'Reject') {
-        finalStatus = 2; // Approved
-      } else {
-        finalStatus = 4; // Rejected
-      }
-    }
-
-    const payload = {
-      finalStatus: finalStatus,
+    let payload: any = {
       comments: this.reviewComments,
       overrideReason: this.overrideReason
     };
+
+    if (action === 'approve') {
+      finalStatus = (this.selectedEval.recommendedDecision === 3 || this.selectedEval.recommendedDecision === 'Reject') ? 4 : 2;
+    } 
+    else if (action === 'reject') {
+      finalStatus = (this.selectedEval.recommendedDecision === 3 || this.selectedEval.recommendedDecision === 'Reject') ? 2 : 4;
+    }
+    else {
+      // Edit & Approve
+      if (this.editedDecision === 'Reject') finalStatus = 4;
+      else finalStatus = 2; // Hire or Shortlist map to Approved
+      
+      payload.editedScore = this.editedScore;
+      payload.editedProbes = this.editedProbes;
+    }
+
+    payload.finalStatus = finalStatus;
 
     this.screeningService.reviewEvaluation(this.selectedEval.id, payload).subscribe({
       next: () => {
