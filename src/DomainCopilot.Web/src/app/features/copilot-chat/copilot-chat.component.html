@@ -15,7 +15,7 @@
       
       <div class="sources-list animate-fade-in" *ngIf="msg.sources && msg.sources.length > 0">
         <span class="source-badge" *ngFor="let source of msg.sources" [title]="source.text">
-          📑 {{source.documentId}} | {{source.sectionTitle}} ({{(source.confidenceScore * 100).toFixed(1)}}%)
+          📑 {{source.docId || source.documentId}} | {{source.sectionTitle}} ({{(source.relevanceScore * 100).toFixed(1)}}%)
         </span>
       </div>
     </div>
