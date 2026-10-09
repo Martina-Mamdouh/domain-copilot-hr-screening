@@ -81,55 +81,69 @@
 
   <!-- Recent Evaluations Table -->
   <div class="table-container glass-panel" *ngIf="!isLoading">
-    <div class="table-header">
-      <h2>Recent Evaluations</h2>
+    <div class="table-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 style="margin: 0;">Recent Evaluations</h2>
       <button class="btn-outline" (click)="loadEvaluations()">Refresh</button>
     </div>
     
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Candidate</th>
-          <th>Date</th>
-          <th>AI Score</th>
-          <th>AI Recommendation</th>
-          <th>Manager Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngIf="recentEvaluations.length === 0">
-          <td colspan="6" style="text-align: center; padding: 2rem;">No evaluations found.</td>
-        </tr>
-        <tr *ngFor="let eval of recentEvaluations">
-          <td>
-            <div class="candidate-info">
-              <span class="candidate-avatar">{{eval.candidateAlias.charAt(0)}}</span>
-              <span class="candidate-name">{{eval.candidateAlias}}</span>
-            </div>
-          </td>
-          <td>{{eval.createdAtUtc | date:'shortDate'}}</td>
-          <td>
-            <span class="score-badge" [ngClass]="{'high': eval.weightedScore >= 80, 'medium': eval.weightedScore >= 60 && eval.weightedScore < 80, 'low': eval.weightedScore < 60}">
-              {{eval.weightedScore}}
-            </span>
-          </td>
-          <td>
-            <span class="badge" [ngClass]="getRecommendationLabel(eval.recommendedDecision).toLowerCase()">
-              {{getRecommendationLabel(eval.recommendedDecision)}}
-            </span>
-          </td>
-          <td>
-            <span class="badge" [ngClass]="getStatusLabel(eval.status).toLowerCase()">
-              {{getStatusLabel(eval.status)}}
-            </span>
-          </td>
-          <td>
-            <button class="btn-text" (click)="openReviewModal(eval)">View</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Date</th>
+            <th>AI Score</th>
+            <th>AI Recommendation</th>
+            <th>Manager Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="recentEvaluations.length === 0">
+            <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-secondary);">No evaluations found.</td>
+          </tr>
+          <tr *ngFor="let eval of paginatedEvaluations" class="table-row-hover">
+            <td>
+              <div class="candidate-info">
+                <span class="candidate-avatar">{{eval.candidateAlias.charAt(0)}}</span>
+                <span class="candidate-name">{{eval.candidateAlias}}</span>
+              </div>
+            </td>
+            <td><span class="date-text">{{eval.createdAtUtc | date:'shortDate'}}</span></td>
+            <td>
+              <span class="score-badge" [ngClass]="{'high': eval.weightedScore >= 80, 'medium': eval.weightedScore >= 60 && eval.weightedScore < 80, 'low': eval.weightedScore < 60}">
+                {{eval.weightedScore}}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getRecommendationLabel(eval.recommendedDecision).toLowerCase()">
+                {{getRecommendationLabel(eval.recommendedDecision)}}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getStatusLabel(eval.status).toLowerCase()">
+                {{getStatusLabel(eval.status)}}
+              </span>
+            </td>
+            <td>
+              <button class="btn-text btn-view" (click)="openReviewModal(eval)">Review</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-controls" *ngIf="recentEvaluations.length > itemsPerPage">
+      <div class="pagination-info">
+        Showing {{(currentPage - 1) * itemsPerPage + 1}} to {{Math.min(currentPage * itemsPerPage, recentEvaluations.length)}} of {{recentEvaluations.length}} entries
+      </div>
+      <div class="pagination-buttons">
+        <button class="btn-page" [disabled]="currentPage === 1" (click)="prevPage()">Previous</button>
+        <span class="page-current">Page {{currentPage}} of {{totalPages}}</span>
+        <button class="btn-page" [disabled]="currentPage === totalPages" (click)="nextPage()">Next</button>
+      </div>
+    </div>
   </div>
 
   <!-- Review Modal Overlay -->

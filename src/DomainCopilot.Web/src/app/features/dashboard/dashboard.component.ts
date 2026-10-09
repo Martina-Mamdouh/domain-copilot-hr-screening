@@ -12,6 +12,8 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
+  Math = Math; // Expose Math to template
+  
   stats = {
     totalEvaluations: 0,
     aiShortlisted: 0,
@@ -34,10 +36,41 @@ export class DashboardComponent implements OnInit {
   isReviewing = false;
   reviewError: string | null = null;
 
+  // Pagination State
+  currentPage = 1;
+  itemsPerPage = 5;
+
   constructor(private screeningService: ScreeningService, public authService: AuthService) {}
 
   ngOnInit() {
     this.loadEvaluations();
+  }
+
+  get paginatedEvaluations() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.recentEvaluations.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+
+  get totalPages() {
+    return Math.ceil(this.recentEvaluations.length / this.itemsPerPage);
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  setPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
   }
 
   loadEvaluations() {
